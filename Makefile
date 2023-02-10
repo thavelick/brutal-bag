@@ -13,7 +13,7 @@ test: # Run tests
 	(source venv/bin/activate && pytest)
 
 tcr: # test and commit or revert
-	source venv/bin/activate && pytest && git add . && git commit -m "wip" || git reset --hard
+	source venv/bin/activate && pytest -rP && git add . && git commit -m "wip" || git reset --hard
 
 # -----------------------------------------------------------
 # CAUTION: If you have a file with the same name as make
