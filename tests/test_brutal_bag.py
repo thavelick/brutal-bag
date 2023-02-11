@@ -5,6 +5,20 @@ from click.testing import CliRunner
 
 from brutal_bag.cli import cli
 from brutal_bag.cli import create_app
+from brutal_bag.cli import Article
+
+sample_articles = [
+    Article(
+        title="Elvis Presley is alive and living in a cave",
+        id="1",
+        content="A hobo wandering in the Appalachian mountains...",
+    ),
+    Article(
+        title="A Yeti was seen on the New Jersey Turnpike",
+        id="2",
+        content="He wore Dock Martins... ",
+    ),
+]
 
 
 def test_version():
@@ -25,8 +39,11 @@ def test_serve(mock_create_app):
     assert result.exit_code == 0
 
 
-def test_homepage():
+@patch("brutal_bag.cli.Article.get_all_unread")
+def test_homepage(get_all_unread):
     "test the homepage"
+
+    get_all_unread.return_value = sample_articles
     app = create_app()
     client = app.test_client()
     response = client.get("/")
@@ -41,8 +58,11 @@ def test_homepage():
     assert "/view/2" in html
 
 
-def test_view_article():
+@patch("brutal_bag.cli.Article.get_all_unread")
+def test_view_article(get_all_unread):
     "test /view/<article_id>"
+    get_all_unread.return_value = sample_articles
+
     app = create_app()
     client = app.test_client()
     response = client.get("/view/1")
@@ -53,8 +73,11 @@ def test_view_article():
     assert "A hobo wandering" in html
 
 
-def test_view_article_not_found():
+@patch("brutal_bag.cli.Article.get_all_unread")
+def test_view_article_not_found(get_all_unread):
     "test missing article on /view/<article_id>"
+
+    get_all_unread.return_value = sample_articles
     app = create_app()
     client = app.test_client()
     response = client.get("/view/999")
