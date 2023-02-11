@@ -1,5 +1,5 @@
 """The command line interface for brutal_bag"""
-from flask import Flask
+from flask import Flask, render_template
 
 import click
 
@@ -9,9 +9,9 @@ def create_app():
     app = Flask(__name__)
 
     @app.route("/")
-    def hello_world():
-        "Just print hello world for now"
-        return "<p>Hello, World!</p>"
+    def homepage():
+        "Homepage"
+        return render_template("index.html")
 
     return app
 

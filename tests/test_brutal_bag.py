@@ -31,4 +31,4 @@ def test_homepage():
     client = app.test_client()
     response = client.get("/")
     assert response.status_code == 200
-    assert response.data == b"<p>Hello, World!</p>"
+    assert response.data == "<h1>BrutalBag</h1>".encode()
