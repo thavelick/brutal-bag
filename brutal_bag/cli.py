@@ -4,6 +4,8 @@ from dataclasses import dataclass
 
 import click
 from flask import Flask, render_template
+from werkzeug.exceptions import NotFound
+
 
 # Make a dataclass for articles
 
@@ -38,6 +40,16 @@ def create_app():
     def homepage():
         "Homepage"
         return render_template("index.html", articles=articles)
+
+    @app.route("/view/<article_id>")
+    def view_article(article_id):
+        "View an article's content"
+        # find the article by it's id:
+        articles_found = [article for article in articles if article.id == article_id]
+        if len(articles_found) == 1:
+            return render_template("view.html", article=articles_found[0])
+        else:
+            raise NotFound
 
     return app
 

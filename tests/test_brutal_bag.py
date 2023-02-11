@@ -39,3 +39,26 @@ def test_homepage():
 
     assert "A Yeti was seen on the New Jersey Turnpike" in html
     assert "/view/2" in html
+
+
+def test_view_article():
+    "test /view/<article_id>"
+    app = create_app()
+    client = app.test_client()
+    response = client.get("/view/1")
+    assert response.status_code == 200
+    html = response.data.decode()
+
+    assert "Elvis Presley is alive and living in a cave" in html
+    assert "A hobo wandering" in html
+
+
+def test_view_article_not_found():
+    "test missing article on /view/<article_id>"
+    app = create_app()
+    client = app.test_client()
+    response = client.get("/view/999")
+    assert response.status_code == 404
+    html = response.data.decode()
+
+    assert "Not Found" in html
