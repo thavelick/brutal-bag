@@ -17,19 +17,36 @@ class Article:
     id: str
     content: str
 
+    @staticmethod
+    def get_all_unread():
+        "get all the unread articles"
+        return [
+            Article(
+                title="Elvis Presley is alive and living in a cave",
+                id="1",
+                content="A hobo wandering in the Appalachian mountains...",
+            ),
+            Article(
+                title="A Yeti was seen on the New Jersey Turnpike",
+                id="2",
+                content="He wore Dock Martins... ",
+            ),
+        ]
 
-articles = [
-    Article(
-        title="Elvis Presley is alive and living in a cave",
-        id="1",
-        content="A hobo wandering in the Appalachian mountains...",
-    ),
-    Article(
-        title="A Yeti was seen on the New Jersey Turnpike",
-        id="2",
-        content="He wore Dock Martins... ",
-    ),
-]
+    @classmethod
+    def get_by_id(cls, article_id):
+        """
+        get an article by it's id.
+
+        Return None if it doesn't exist.
+        """
+
+        articles_found = [
+            article for article in cls.get_all_unread() if article.id == article_id
+        ]
+        if len(articles_found) == 1:
+            return articles_found[0]
+        return None
 
 
 def create_app():
@@ -39,17 +56,17 @@ def create_app():
     @app.route("/")
     def homepage():
         "Homepage"
-        return render_template("index.html", articles=articles)
+        return render_template("index.html", articles=Article.get_all_unread())
 
     @app.route("/view/<article_id>")
     def view_article(article_id):
         "View an article's content"
-        # find the article by it's id:
-        articles_found = [article for article in articles if article.id == article_id]
-        if len(articles_found) == 1:
-            return render_template("view.html", article=articles_found[0])
-        else:
+        article = Article.get_by_id(article_id)
+
+        if not article:
             raise NotFound
+
+        return render_template("view.html", article=article)
 
     return app
 
