@@ -31,9 +31,7 @@ setup(
         [console_scripts]
         brutal-bag=brutal_bag.cli:cli
     """,
-    install_requires=["click"],
-    extras_require={
-        "test": ["pytest"]
-    },
-    python_requires=">=3.7",
+    install_requires=["click>=8.1.3", "flask>=2.2.2"],
+    extras_require={"test": ["pytest==7.2.1"]},
+    python_requires=">=3.10",
 )
