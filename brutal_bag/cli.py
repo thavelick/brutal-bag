@@ -3,6 +3,33 @@ from flask import Flask, render_template
 
 import click
 
+# import dataclasses
+from dataclasses import dataclass
+
+# Make a dataclass for articles
+
+
+@dataclass
+class Article:
+    "An article from Wallabag"
+    title: str
+    id: str
+    content: str
+
+
+articles = [
+    Article(
+        title="Elvis Presley is alive and living in a cave",
+        id="1",
+        content="A hobo wandering in the Appalachian mountains...",
+    ),
+    Article(
+        title="A Yeti was seen on the New Jersey Turnpike",
+        id="2",
+        content="He wore Converse All Stars... ",
+    ),
+]
+
 
 def create_app():
     "Create the flask app"
@@ -11,7 +38,7 @@ def create_app():
     @app.route("/")
     def homepage():
         "Homepage"
-        return render_template("index.html")
+        return render_template("index.html", articles=articles)
 
     return app
 

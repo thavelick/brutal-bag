@@ -31,4 +31,11 @@ def test_homepage():
     client = app.test_client()
     response = client.get("/")
     assert response.status_code == 200
-    assert response.data == "<h1>BrutalBag</h1>".encode()
+    html = response.data.decode()
+    assert "<h1>BrutalBag</h1>" in html
+
+    assert "Elvis Presley is alive and living in a cave" in html
+    assert "/view/1" in html
+
+    assert "A Yeti was seen on the New Jersey Turnpike" in html
+    assert "/view/2" in html
