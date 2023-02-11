@@ -1,10 +1,9 @@
 """The command line interface for brutal_bag"""
-from flask import Flask, render_template
-
-import click
-
 # import dataclasses
 from dataclasses import dataclass
+
+import click
+from flask import Flask, render_template
 
 # Make a dataclass for articles
 
@@ -26,7 +25,7 @@ articles = [
     Article(
         title="A Yeti was seen on the New Jersey Turnpike",
         id="2",
-        content="He wore Converse All Stars... ",
+        content="He wore Dock Martins... ",
     ),
 ]
 
@@ -50,7 +49,10 @@ def cli():
 
 
 @cli.command(name="serve")
-def serve():
+@click.option("-d", "--debug", default=False, help="run in debug mode")
+def serve(debug):
     "Start the web server"
     app = create_app()
+    app.debug = debug
+    print("debug mode", debug)
     app.run()
