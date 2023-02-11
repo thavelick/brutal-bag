@@ -1,6 +1,6 @@
 """The command line interface for brutal_bag"""
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import click
 import httpx
@@ -93,12 +93,23 @@ class Article:
     id: str
     content: str
 
+    def __post_init__(self):
+        # make sure the id is a string
+        self.id = str(self.id)
+
     @staticmethod
     def get_all_unread():
         "get all the unread articles from Wallabag."
         wallabag = Wallabag()
         article_data = wallabag.get_unread_articles()
-        return [Article(**article) for article in article_data]
+        return [
+            Article(
+                title=article["title"],
+                id=article["id"],
+                content=article["content"],
+            )
+            for article in article_data
+        ]
 
     @classmethod
     def get_by_id(cls, article_id):
