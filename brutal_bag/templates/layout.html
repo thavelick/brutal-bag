@@ -1,0 +1,84 @@
+{# Layout originally taken from the Miniflux project, used under the Apache 2.0 License #}
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}{% endblock %} - BrutalBag</title>
+    <link rel="stylesheet" type="text/css" href="/static/styles.css">
+</head>
+
+<body>
+    <header class="header">
+        <nav>
+            <div class="logo">
+                <a href="/">Brutal<span>Bag</span></a>
+            </div>
+            <ul>
+                <li>
+                    <a href="/unread">Unread
+                        <span class="unread-counter-wrapper">(<span class="unread-counter">109</span>)</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/starred">Starred</a>
+                </li>
+                <li>
+                    <a href="/history">History</a>
+                </li>
+                <li class="active">
+                    <a href="/feeds">Feeds
+                    </a>
+                    <a href="/subscribe">
+                        (+)
+                    </a>
+                </li>
+                <li>
+                    <a href="/categories">Categories</a>
+                </li>
+                <li>
+                    <a href="/settings">Settings</a>
+                </li>
+
+                <li>
+                    <a href="/logout" title="Logged in as admin">Logout</a>
+                </li>
+
+            </ul>
+            <div class="search">
+                <div class="search-toggle-switch ">
+                    <a href="#" data-action="search">&laquo;&nbsp;Search</a>
+                </div>
+                <form action="/search" class="search-form ">
+                    <input type="search" name="q" id="search-input" placeholder="Search..." required>
+                </form>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <template id="icon-read"><svg class="icon" aria-hidden="true">
+            <use xlink:href="/icon/sprite.svg#icon-read" />
+        </svg></template>
+    <template id="icon-unread"><svg class="icon" aria-hidden="true">
+            <use xlink:href="/icon/sprite.svg#icon-unread" />
+        </svg></template>
+    <template id="icon-star"><svg class="icon" aria-hidden="true">
+            <use xlink:href="/icon/sprite.svg#icon-star" />
+        </svg></template>
+    <template id="icon-unstar"><svg class="icon" aria-hidden="true">
+            <use xlink:href="/icon/sprite.svg#icon-unstar" />
+        </svg></template>
+    <template id="icon-save"><svg class="icon" aria-hidden="true">
+            <use xlink:href="/icon/sprite.svg#icon-save" />
+        </svg></template>
+
+    <div id="toast-wrapper" role="alert" aria-live="assertive" aria-atomic="true">
+        <span id="toast-msg"></span>
+    </div>
+</body>
+
+</html>

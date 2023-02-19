@@ -1,12 +1,13 @@
-<html>
-
-<head>
-    <title>{{ article.title }}</title>
-</head>
-
-<body>
-    <h1>{{ article.title }}</h1>
-    {{ article.content }}
-</body>
-
-</html>
+{# Layout originally taken from the Miniflux project, used under the Apache 2.0 License #}
+{% extends "layout.html" %}
+{% block title %}{{ article.title }}{% endblock %}
+{% block content %}
+<section class="entry">
+    <header class="entry-header">
+        <h1>{{ article.title }}</h1>
+    </header>
+    <article role="article" class="entry-content">
+        {{ article.content | safe }}
+    </article>
+</section>
+{% endblock %}

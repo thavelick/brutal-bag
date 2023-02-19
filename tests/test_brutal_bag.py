@@ -12,11 +12,14 @@ sample_articles = [
         title="Elvis Presley is alive and living in a cave",
         id="1",
         content="A hobo wandering in the Appalachian mountains...",
+        external_url="https://www.elvispresley.com/article/1",
     ),
     Article(
         title="A Yeti was seen on the New Jersey Turnpike",
         id="2",
         content="He wore Dock Martins... ",
+        published_by=["Questionable Geographic"],
+        external_url="https://www.questionablegeographic.com/news/45687",
     ),
 ]
 
@@ -49,12 +52,13 @@ def test_homepage(get_all_unread):
     response = client.get("/")
     assert response.status_code == 200
     html = response.data.decode()
-    assert "<h1>BrutalBag</h1>" in html
+    assert "Brutal<span>Bag</span>" in html
 
     assert "Elvis Presley is alive and living in a cave" in html
     assert "/view/1" in html
 
     assert "A Yeti was seen on the New Jersey Turnpike" in html
+    assert "Questionable Geographic" in html
     assert "/view/2" in html
 
 

@@ -1,19 +1,106 @@
-<html>
+{# Layout originally taken from the Miniflux project, used under the Apache 2.0 License #}
+{% extends "layout.html" %}
+{% block title %}Unread{% endblock %}
+{% block content %}
+<section class="page-header">
+    <h1>Unread (<span class="unread-counter">116</span>)</h1>
 
-<head>
-    <title>BrutalBag</title>
-</head>
-
-<body>
-    <h1>BrutalBag</h1>
     <ul>
-        {% for article in articles %}
         <li>
-            <a href="/view/{{ article.id }}">{{ article.title }}</a>
+            <a href="#" data-action="markPageAsRead" data-show-only-unread="1" data-label-question="Are you sure?"
+                data-label-yes="yes" data-label-no="no" data-label-loading="In progress..."><svg class="icon"
+                    aria-hidden="true">
+                    <use xlink:href="/icon/sprite.svg#icon-mark-page-as-read" />
+                </svg>Mark this page as read</a>
         </li>
-        {% endfor %}
+        <li>
+            <a href="#" data-confirm="true" data-url="/mark-all-as-read" data-redirect-url="/unread"
+                data-label-question="Are you sure?" data-label-yes="yes" data-label-no="no"
+                data-label-loading="In progress..."><svg class="icon" aria-hidden="true">
+                    <use xlink:href="/icon/sprite.svg#icon-mark-all-as-read" />
+                </svg>Mark all as read</a>
+        </li>
     </ul>
 
-</body>
+</section>
+<div class="pagination">
+    <div class="pagination-prev ">
+        <a href="/unread" data-page="previous" rel="prev">Previous</a>
+    </div>
 
-</html>
+    <div class="pagination-next disabled">
+        Next
+    </div>
+</div>
+
+
+<div class="items hide-read-items">
+
+    {% for article in articles %}
+    <article role="article" class="item touch-item item-status-unread" data-id="7595">
+        <div class="item-header" dir="auto">
+            <span class="item-title">
+
+                <!-- <img src="/feed/icon/21" width="16" height="16" loading="lazy" alt="[site name]"> -->
+
+                <a href="/view/{{ article.id }}" title="{{ article.title }}">{{ article.title}}</a>
+            </span>
+            <!-- <span class="category"><a href="/category/4/entries">Comics</a></span> -->
+        </div>
+
+        <div class="item-meta">
+            <ul class="item-meta-info">
+                {% if article.published_by_str() | length > 0 %}
+                <li>
+                    {{ article.published_by_str() }}
+                </li>
+                {% endif %}
+                <li>
+                    <time datetime="2023-02-18 17:00:00" title="2023-02-18 17:00:00">20 hours ago</time>
+                </li>
+
+                <li>
+                    <span>
+                        1 minute read
+                    </span>
+                </li>
+
+            </ul>
+            <ul class="item-meta-icons">
+                <li>
+                    <a href="#" title="Change entry status" data-toggle-status="true" data-label-loading="Saving..."
+                        data-label-read="Read" data-label-unread="Unread" data-value="unread"><svg class="icon"
+                            aria-hidden="true">
+                            <use xlink:href="/icon/sprite.svg#icon-read" />
+                        </svg><span class="icon-label">Read</span></a>
+                </li>
+                <li>
+                    <a href="#" data-toggle-bookmark="true" data-bookmark-url="/entry/bookmark/7595"
+                        data-label-loading="Saving..." data-label-star="Star" data-label-unstar="Unstar"
+                        data-value="unstar"><svg class="icon" aria-hidden="true">
+                            <use xlink:href="/icon/sprite.svg#icon-star" />
+                        </svg><span class="icon-label">Star</span></a>
+                </li>
+
+
+                <li>
+                    <a href="#" title="Save this article" data-save-entry="true" data-save-url="/entry/save/7595"
+                        data-label-loading="Saving..." data-label-done="Done!"><svg class="icon" aria-hidden="true">
+                            <use xlink:href="/icon/sprite.svg#icon-save" />
+                        </svg><span class="icon-label">Save</span></a>
+                </li>
+
+                <li>
+                    <a href="{{ article.external_url }}" target="_blank" rel="noopener noreferrer"
+                        referrerpolicy="no-referrer" data-original-link="true"><svg class="icon" aria-hidden="true">
+                            <use xlink:href="/icon/sprite.svg#icon-external-link" />
+                        </svg><span class="icon-label">External link</span></a>
+                </li>
+
+            </ul>
+        </div>
+
+    </article>
+    {% endfor %}
+</div>
+{% endblock %}
