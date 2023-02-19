@@ -25,17 +25,13 @@ class Article:
         wallabag = Wallabag()
         article_data = wallabag.get_unread_articles()
 
-        from pprint import pprint
-
-        pprint(article_data[0])
-
         return [
             Article(
-                title=article["title"],
-                id=article["id"],
-                content=article["content"],
-                published_by=article["published_by"],
-                external_url=article["url"],
+                **{
+                    key: article.get(key)
+                    for key in ["title", "id", "content", "published_by"]
+                },
+                external_url=article.get("url", None),
             )
             for article in article_data
         ]

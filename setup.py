@@ -34,6 +34,6 @@ setup(
     install_requires=["click", "flask", "httpx"],
     extras_require={"test": ["pytest"]},
     python_requires=">=3.7",
-    package_data={"brutal_bag": ["templates/*.html"]},
+    package_data={"brutal_bag": ["templates/*.html", "static/*"]},
     include_package_data=True,
 )

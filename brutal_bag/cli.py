@@ -10,6 +10,11 @@ def create_app():
     "Create the flask app"
     app = Flask(__name__)
 
+    @app.context_processor
+    def count_unread():
+        "Count the number of unread articles"
+        return {"count_unread": len(Article.get_all_unread())}
+
     @app.route("/")
     def homepage():
         "Homepage"
