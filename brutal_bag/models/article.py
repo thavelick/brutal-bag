@@ -21,10 +21,6 @@ class Article:
     reading_time: int = None
     tags: list = None
 
-    def __post_init__(self):
-        # make sure the id is a string
-        self.id = str(self.id)
-
     @staticmethod
     def from_wallabag_dict(source_dict):
         "Create an Article from a wallabag response dict."
@@ -38,7 +34,7 @@ class Article:
             ]
         }
 
-        dest_dict["id"] = source_dict.get("id")
+        dest_dict["id"] = str(source_dict.get("id"))
         dest_dict["external_url"] = source_dict.get("url")
         dest_dict["tags"] = source_dict.get("tags", [])
 
@@ -75,7 +71,6 @@ class Article:
 
         Return None if it doesn't exist.
         """
-
         articles_found = [
             article for article in cls.get_all_unread() if article.id == article_id
         ]
@@ -95,7 +90,7 @@ class Article:
         if not self.date:
             return ""
 
-        return humanize.naturaltime(datetime.utcnow() - self.date)
+        return humanize.naturaltime(self._now() - self.date)
 
     def minutes_read(self):
         "return the number of minutes to read the article"
@@ -110,3 +105,7 @@ class Article:
             return "1 minute read"
 
         return f"{self.reading_time} minutes read"
+
+    def _now(self):
+        "return the current date"
+        return datetime.utcnow()
