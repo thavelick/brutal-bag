@@ -56,7 +56,9 @@
                 </li>
                 {% endif %}
                 <li>
-                    <time datetime="2023-02-18 17:00:00" title="2023-02-18 17:00:00">20 hours ago</time>
+                    <time datetime="{{ article.date }}" title="{{ article.date }}">
+                        {{ article.relative_date() }}
+                    </time>
                 </li>
 
                 <li>
