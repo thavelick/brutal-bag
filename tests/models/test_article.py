@@ -5,7 +5,8 @@ import pytest
 from brutal_bag.models.article import Article
 
 
-def make_article():
+@pytest.fixture(name="article")
+def article_fixture():
     return Article(
         id="1",
         title="Elvis Presley is alive and living in a cave",
@@ -18,9 +19,7 @@ def make_article():
     )
 
 
-def test_create():
-    article = make_article()
-
+def test_create(article):
     assert article
     assert article.id == "1"
     assert article.title == "Elvis Presley is alive and living in a cave"
@@ -44,17 +43,17 @@ def test_from_wallabag_dict():
         "tags": ["cave", "elvis"],
     }
 
-    article = Article.from_wallabag_dict(source_dict)
+    article_from_wallabag = Article.from_wallabag_dict(source_dict)
 
-    assert article
-    assert article.id == "1"
-    assert article.title == "Elvis Presley is alive and living in a cave"
-    assert article.content == "A hobo wandering"
-    assert article.external_url == "https://www.example.com/1"
-    assert article.published_by == ["Hobo News"]
-    assert article.date == datetime(2019, 11, 13, 20, 51, 47)
-    assert article.reading_time == 3
-    assert article.tags == ["cave", "elvis"]
+    assert article_from_wallabag
+    assert article_from_wallabag.id == "1"
+    assert article_from_wallabag.title == "Elvis Presley is alive and living in a cave"
+    assert article_from_wallabag.content == "A hobo wandering"
+    assert article_from_wallabag.external_url == "https://www.example.com/1"
+    assert article_from_wallabag.published_by == ["Hobo News"]
+    assert article_from_wallabag.date == datetime(2019, 11, 13, 20, 51, 47)
+    assert article_from_wallabag.reading_time == 3
+    assert article_from_wallabag.tags == ["cave", "elvis"]
 
 
 @pytest.mark.parametrize(
@@ -66,8 +65,7 @@ def test_from_wallabag_dict():
         (None, ""),
     ],
 )
-def test_published_by_str(published_by, expected_str):
-    article = make_article()
+def test_published_by_str(article, published_by, expected_str):
     article.published_by = published_by
     assert article.published_by_str() == expected_str
 
@@ -80,14 +78,12 @@ def test_published_by_str(published_by, expected_str):
         (None, ""),
     ],
 )
-def test_minutes_read(reading_time, expected_str):
-    article = make_article()
+def test_minutes_read(article, reading_time, expected_str):
     article.reading_time = reading_time
     assert article.minutes_read() == expected_str
 
 
-def test_relative_date(monkeypatch):
-    article = make_article()
+def test_relative_date(article, monkeypatch):
     article.date = datetime(2019, 1, 1)
 
     monkeypatch.setattr(article, "_now", lambda: datetime(2019, 1, 2))
