@@ -13,6 +13,7 @@ sample_articles = [
         id="1",
         content="A hobo wandering in the Appalachian mountains...",
         external_url="https://www.elvispresley.com/article/1",
+        tags=[],
     ),
     Article(
         title="A Yeti was seen on the New Jersey Turnpike",
@@ -20,6 +21,7 @@ sample_articles = [
         content="He wore Dock Martins... ",
         published_by=["Questionable Geographic"],
         external_url="https://www.questionablegeographic.com/news/45687",
+        tags=[],
     ),
 ]
 

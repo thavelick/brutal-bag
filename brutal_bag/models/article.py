@@ -19,6 +19,7 @@ class Article:
     published_by: list = None
     date: datetime = None
     reading_time: int = None
+    tags: list = None
 
     def __post_init__(self):
         # make sure the id is a string
@@ -39,6 +40,7 @@ class Article:
 
         dest_dict["id"] = source_dict.get("id")
         dest_dict["external_url"] = source_dict.get("url")
+        dest_dict["tags"] = source_dict.get("tags", [])
 
         # should probably refactor all this at some point to save
         # both published_at and created_at in the Article model,
@@ -63,11 +65,6 @@ class Article:
         "get all the unread articles from Wallabag."
         wallabag = Wallabag()
         article_data = wallabag.get_unread_articles()
-
-        sample_article = article_data[0]
-        print(sample_article.keys())
-        # time looks like 2019-11-13T13:51:47-0700
-        print("published_at: ", sample_article.get("published_at"))
 
         return [Article.from_wallabag_dict(article) for article in article_data]
 

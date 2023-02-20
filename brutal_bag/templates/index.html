@@ -45,7 +45,10 @@
 
                 <a href="/view/{{ article.id }}" title="{{ article.title }}">{{ article.title}}</a>
             </span>
-            <!-- <span class="category"><a href="/category/4/entries">Comics</a></span> -->
+
+            {% for tag in article.tags %}
+            <span class="category"><a href="/tag/{{ tag['id'] }}/entries">{{ tag["label"] }}</a></span>
+            {% endfor %}
         </div>
 
         <div class="item-meta">
