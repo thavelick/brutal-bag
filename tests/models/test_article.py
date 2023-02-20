@@ -31,31 +31,6 @@ def test_create(article):
     assert article.tags == ["cave", "elvis"]
 
 
-def test_from_wallabag_dict():
-    source_dict = {
-        "id": 1,
-        "title": "Elvis Presley is alive and living in a cave",
-        "content": "A hobo wandering",
-        "url": "https://www.example.com/1",
-        "published_by": ["Hobo News"],
-        "published_at": "2019-11-13T13:51:47-0700",
-        "reading_time": 3,
-        "tags": ["cave", "elvis"],
-    }
-
-    article_from_wallabag = Article.from_wallabag_dict(source_dict)
-
-    assert article_from_wallabag
-    assert article_from_wallabag.id == "1"
-    assert article_from_wallabag.title == "Elvis Presley is alive and living in a cave"
-    assert article_from_wallabag.content == "A hobo wandering"
-    assert article_from_wallabag.external_url == "https://www.example.com/1"
-    assert article_from_wallabag.published_by == ["Hobo News"]
-    assert article_from_wallabag.date == datetime(2019, 11, 13, 20, 51, 47)
-    assert article_from_wallabag.reading_time == 3
-    assert article_from_wallabag.tags == ["cave", "elvis"]
-
-
 @pytest.mark.parametrize(
     "published_by, expected_str",
     [
@@ -88,3 +63,8 @@ def test_relative_date(article, monkeypatch):
 
     monkeypatch.setattr(article, "_now", lambda: datetime(2019, 1, 2))
     assert article.relative_date() == "a day ago"
+
+
+def test_relative_date_real_time(article):
+    article.date = datetime(2019, 1, 1)
+    assert "ago" in article.relative_date()

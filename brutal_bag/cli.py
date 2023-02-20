@@ -3,27 +3,31 @@ import click
 from flask import Flask, render_template
 from werkzeug.exceptions import NotFound
 
-from .models.article import Article
+from .models.wallabag_article_fetcher import WallabagArticleFetcher
+from .models.wallabag import Wallabag
 
 
 def create_app():
     "Create the flask app"
     app = Flask(__name__)
+    wallabag = Wallabag()
 
     @app.context_processor
     def count_unread():
         "Count the number of unread articles"
-        return {"count_unread": len(Article.get_all_unread())}
+        return {"count_unread": len(WallabagArticleFetcher(wallabag).get_all_unread())}
 
     @app.route("/")
     def homepage():
         "Homepage"
-        return render_template("index.html", articles=Article.get_all_unread())
+        return render_template(
+            "index.html", articles=WallabagArticleFetcher(wallabag).get_all_unread()
+        )
 
     @app.route("/view/<article_id>")
     def view_article(article_id):
         "View an article's content"
-        article = Article.get_by_id(article_id)
+        article = WallabagArticleFetcher(wallabag).get_by_id(article_id)
 
         if not article:
             raise NotFound

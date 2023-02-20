@@ -5,7 +5,8 @@ from click.testing import CliRunner
 
 from brutal_bag.cli import cli
 from brutal_bag.cli import create_app
-from brutal_bag.cli import Article
+from brutal_bag.models.article import Article
+from brutal_bag.models.wallabag_article_fetcher import WallabagArticleFetcher
 
 sample_articles = [
     Article(
@@ -44,7 +45,7 @@ def test_serve(mock_create_app):
     assert result.exit_code == 0
 
 
-@patch("brutal_bag.cli.Article.get_all_unread")
+@patch.object(WallabagArticleFetcher, "get_all_unread")
 def test_homepage(get_all_unread):
     "test the homepage"
 
@@ -64,7 +65,7 @@ def test_homepage(get_all_unread):
     assert "/view/2" in html
 
 
-@patch("brutal_bag.cli.Article.get_all_unread")
+@patch.object(WallabagArticleFetcher, "get_all_unread")
 def test_view_article(get_all_unread):
     "test /view/<article_id>"
     get_all_unread.return_value = sample_articles
@@ -79,7 +80,7 @@ def test_view_article(get_all_unread):
     assert "A hobo wandering" in html
 
 
-@patch("brutal_bag.cli.Article.get_all_unread")
+@patch.object(WallabagArticleFetcher, "get_all_unread")
 def test_view_article_not_found(get_all_unread):
     "test missing article on /view/<article_id>"
 
