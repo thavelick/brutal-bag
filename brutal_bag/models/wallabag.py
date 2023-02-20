@@ -9,11 +9,11 @@ class Wallabag:
     """A Wallabag client"""
 
     def __init__(self):
-        self.client_id = os.environ["WALLABAG_CLIENT_ID"]
-        self.client_secret = os.environ["WALLABAG_CLIENT_SECRET"]
-        self.password = os.environ["WALLABAG_PASSWORD"]
-        self.url = os.environ["WALLABAG_URL"]
-        self.username = os.environ["WALLABAG_USERNAME"]
+        self.client_id = os.environ.get("WALLABAG_CLIENT_ID")
+        self.client_secret = os.environ.get("WALLABAG_CLIENT_SECRET")
+        self.password = os.environ.get("WALLABAG_PASSWORD")
+        self.url = os.environ.get("WALLABAG_URL")
+        self.username = os.environ.get("WALLABAG_USERNAME")
 
     def get_oauth_token(self):
         """
