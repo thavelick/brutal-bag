@@ -1,5 +1,7 @@
 from datetime import datetime
 
+import pytest
+
 from brutal_bag.models.article import Article
 
 
@@ -55,34 +57,33 @@ def test_from_wallabag_dict():
     assert article.tags == ["cave", "elvis"]
 
 
-# TODO: Make this data-driven
-def test_published_by_str():
+@pytest.mark.parametrize(
+    "published_by, expected_str",
+    [
+        (["Hobo News"], "Hobo News"),
+        (["Hobo News", "Jack Black"], "Hobo News, Jack Black"),
+        ([], ""),
+        (None, ""),
+    ],
+)
+def test_published_by_str(published_by, expected_str):
     article = make_article()
-
-    article.published_by = ["Hobo News"]
-    assert article.published_by_str() == "Hobo News"
-
-    article.published_by = ["Hobo News", "Jack Black"]
-    assert article.published_by_str() == "Hobo News, Jack Black"
-
-    article.published_by = []
-    assert article.published_by_str() == ""
-
-    article.published_by = None
-    assert article.published_by_str() == ""
+    article.published_by = published_by
+    assert article.published_by_str() == expected_str
 
 
-def test_minutes_read():
+@pytest.mark.parametrize(
+    "reading_time, expected_str",
+    [
+        (3, "3 minutes read"),
+        (1, "1 minute read"),
+        (None, ""),
+    ],
+)
+def test_minutes_read(reading_time, expected_str):
     article = make_article()
-
-    article.reading_time = 3
-    assert article.minutes_read() == "3 minutes read"
-
-    article.reading_time = 1
-    assert article.minutes_read() == "1 minute read"
-
-    article.reading_time = None
-    assert article.minutes_read() == ""
+    article.reading_time = reading_time
+    assert article.minutes_read() == expected_str
 
 
 def test_relative_date(monkeypatch):
