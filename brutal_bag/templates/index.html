@@ -37,7 +37,7 @@
 <div class="items hide-read-items">
 
     {% for article in articles %}
-    <article role="article" class="item touch-item item-status-unread" data-id="7595">
+    <article role="article" class="item touch-item item-status-unread" data-id="{{ article.id }}">
         <div class="item-header" dir="auto">
             <span class="item-title">
 
@@ -61,11 +61,13 @@
                     </time>
                 </li>
 
+                {% if article.minutes_read() | length > 0 %}
                 <li>
                     <span>
-                        1 minute read
+                        {{ article.minutes_read() }}
                     </span>
                 </li>
+                {% endif %}
 
             </ul>
             <ul class="item-meta-icons">
