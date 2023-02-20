@@ -5,6 +5,10 @@ import json
 import time
 
 
+class MissingEnvironment(Exception):
+    pass
+
+
 class Wallabag:
     """A Wallabag client"""
 
@@ -46,6 +50,12 @@ class Wallabag:
         Returns:
             A dict containing the token and expiration as a unix timestamp.
         """
+        # make sure we have all the required environment variables
+        if not all(
+            self.client_id, self.client_secret, self.password, self.url, self.username
+        ):
+            raise MissingEnvironment("Missing required environment variables")
+
         data = {
             "grant_type": "password",
             "client_id": self.client_id,
