@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-from brutal_bag.models.wallabag import Wallabag
+from .wallabag import Wallabag
 
 
 @dataclass
