@@ -52,7 +52,7 @@ class Wallabag:
         """
         # make sure we have all the required environment variables
         if not all(
-            self.client_id, self.client_secret, self.password, self.url, self.username
+            [self.client_id, self.client_secret, self.password, self.url, self.username]
         ):
             raise MissingEnvironment("Missing required environment variables")
 
