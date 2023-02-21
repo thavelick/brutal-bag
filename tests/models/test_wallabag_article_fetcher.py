@@ -24,7 +24,7 @@ def elvis_entry_fixture():
         "published_by": ["Hobo News"],
         "published_at": "2019-11-13T13:51:47-0700",
         "reading_time": 3,
-        "tags": ["cave", "elvis"],
+        "tags": [{"id": "1", "label": "Cave", "slug": "cave"}],
     }
 
 
@@ -49,7 +49,11 @@ def test_wallabag_entry_to_article(elvis_entry):
     assert article.published_by == ["Hobo News"]
     assert article.date == datetime(2019, 11, 13, 20, 51, 47)
     assert article.reading_time == 3
-    assert article.tags == ["cave", "elvis"]
+    assert len(article.tags) == 1
+    tag = article.tags[0]
+    assert tag.id == "1"
+    assert tag.label == "Cave"
+    assert tag.slug == "cave"
 
 
 def test_get_all_unread(wallabag_article_fetcher):

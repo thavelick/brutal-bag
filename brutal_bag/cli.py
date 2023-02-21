@@ -3,8 +3,9 @@ import click
 from flask import Flask, render_template
 from werkzeug.exceptions import NotFound
 
-from .models.wallabag_article_fetcher import WallabagArticleFetcher
 from .models.wallabag import Wallabag
+from .models.wallabag_article_fetcher import WallabagArticleFetcher
+from .models.wallabag_tag_fetcher import WallabagTagFetcher
 
 
 def create_app():
@@ -23,6 +24,11 @@ def create_app():
         return render_template(
             "index.html", articles=WallabagArticleFetcher(wallabag).get_all_unread()
         )
+
+    @app.route("/tags")
+    def tags():
+        "List all tags"
+        return render_template("tags.html", tags=WallabagTagFetcher(wallabag).get_all())
 
     @app.route("/view/<article_id>")
     def view_article(article_id):

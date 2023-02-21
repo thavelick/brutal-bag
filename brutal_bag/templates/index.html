@@ -47,7 +47,7 @@
             </span>
 
             {% for tag in article.tags %}
-            <span class="category"><a href="/tag/{{ tag['id'] }}/entries">{{ tag["label"] }}</a></span>
+            <span class="category"><a href="/tag/{{ tag.id }}/entries">{{ tag.label }}</a></span>
             {% endfor %}
         </div>
 

@@ -89,3 +89,19 @@ class Wallabag:
         )
 
         return response.json().get("_embedded", {}).get("items", [])
+
+    def get_all_tags(self):
+        """
+        Get all the tags from Wallabag.
+        Returns:
+            A list of dicts containing the tag data.
+        """
+
+        token = self.get_oauth_token()
+
+        response = httpx.get(
+            f"{self.url}/api/tags.json",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+
+        return response.json()

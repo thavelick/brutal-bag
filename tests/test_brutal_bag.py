@@ -6,7 +6,9 @@ from click.testing import CliRunner
 from brutal_bag.cli import cli
 from brutal_bag.cli import create_app
 from brutal_bag.models.article import Article
+from brutal_bag.models.tag import Tag
 from brutal_bag.models.wallabag_article_fetcher import WallabagArticleFetcher
+from brutal_bag.models.wallabag_tag_fetcher import WallabagTagFetcher
 
 sample_articles = [
     Article(
@@ -92,3 +94,21 @@ def test_view_article_not_found(get_all_unread):
     html = response.data.decode()
 
     assert "Not Found" in html
+
+
+@patch.object(WallabagArticleFetcher, "get_all_unread")
+@patch.object(WallabagTagFetcher, "get_all")
+def test_tags(get_all_tags, get_all_unread):
+    "test /tags"
+    get_all_unread.return_value = sample_articles
+    get_all_tags.return_value = [
+        Tag(id="1", label="Blogs", slug="blogs", unread_count=0),
+    ]
+
+    app = create_app()
+    client = app.test_client()
+    response = client.get("/tags")
+    assert response.status_code == 200
+    html = response.data.decode()
+
+    assert "Blogs" in html

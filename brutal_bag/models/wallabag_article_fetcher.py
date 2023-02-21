@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 
 from .article import Article
+from .tag import Tag
 
 
 class WallabagArticleFetcher:
@@ -22,7 +23,10 @@ class WallabagArticleFetcher:
 
         dest_dict["id"] = str(entry.get("id"))
         dest_dict["external_url"] = entry.get("url")
-        dest_dict["tags"] = entry.get("tags", [])
+
+        raw_tags = entry.get("tags", [])
+
+        dest_dict["tags"] = [Tag(**tag) for tag in raw_tags]
 
         # should probably refactor all this at some point to save
         # both published_at and created_at in the Article model,
