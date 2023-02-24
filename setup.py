@@ -31,7 +31,7 @@ setup(
         [console_scripts]
         brutal-bag=brutal_bag.cli:cli
     """,
-    install_requires=["click", "flask", "httpx", "humanize"],
+    install_requires=["click", "flask", "httpx", "humanize", "Flask-Caching"],
     extras_require={"test": ["pytest", "pytest-cov"]},
     python_requires=">=3.7",
     package_data={"brutal_bag": ["templates/*.html", "static/*", "models/*.py"]},

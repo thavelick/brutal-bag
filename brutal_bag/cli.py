@@ -2,6 +2,7 @@
 import click
 from flask import Flask, render_template
 from werkzeug.exceptions import NotFound
+from flask_caching import Cache
 
 from .models.wallabag import Wallabag
 from .models.wallabag_article_fetcher import WallabagArticleFetcher
@@ -11,19 +12,23 @@ from .models.wallabag_tag_fetcher import WallabagTagFetcher
 def create_app():
     "Create the flask app"
     app = Flask(__name__)
+    app.config["CACHE_TYPE"] = "SimpleCache"
+    cache = Cache(app)
     wallabag = Wallabag()
+
+    @cache.cached(timeout=60)
+    def get_all_unread():
+        return WallabagArticleFetcher(wallabag).get_all_unread()
 
     @app.context_processor
     def count_unread():
         "Count the number of unread articles"
-        return {"count_unread": len(WallabagArticleFetcher(wallabag).get_all_unread())}
+        return {"count_unread": len(get_all_unread())}
 
     @app.route("/")
     def homepage():
         "Homepage"
-        return render_template(
-            "index.html", articles=WallabagArticleFetcher(wallabag).get_all_unread()
-        )
+        return render_template("index.html", articles=get_all_unread())
 
     @app.route("/tags")
     def tags():
