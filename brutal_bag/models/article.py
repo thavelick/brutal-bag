@@ -1,7 +1,8 @@
 """Article model."""
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
+
 import humanize
 
 
@@ -45,6 +46,16 @@ class Article:
             return "1 minute read"
 
         return f"{self.reading_time} minutes read"
+
+    def external_domain(self):
+        "return the domain of the external url"
+        if not self.external_url:
+            return ""
+
+        try:
+            return self.external_url.split("/", 3)[2]
+        except IndexError:
+            return ""
 
     def _now(self):
         "return the current date"

@@ -68,3 +68,17 @@ def test_relative_date(article, monkeypatch):
 def test_relative_date_real_time(article):
     article.date = datetime(2019, 1, 1)
     assert "ago" in article.relative_date()
+
+
+@pytest.mark.parametrize(
+    "external_url, expected_domain",
+    [
+        ("https://www.example.com/test-article", "www.example.com"),
+        (None, ""),
+        ("", ""),
+        ("invalid_url", ""),
+    ],
+)
+def test_external_domain(article, external_url, expected_domain):
+    article.external_url = external_url
+    assert article.external_domain() == expected_domain
