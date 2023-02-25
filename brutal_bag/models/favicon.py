@@ -30,7 +30,6 @@ def get_favicon_url(article_url):
     "Get the favicon URL for an article URL"
     try:
         response = httpx.get(article_url)
-        print(response.headers.get("content-type"))
 
     except (httpx.ConnectError, httpx.ConnectTimeout):
         return None
@@ -48,7 +47,6 @@ def get_favicon_url(article_url):
             # some sites have a 0 byte favicon.ico, so check the content length
             if response.headers.get("content-length") == "0":
                 return None
-            print(response.headers.get("content-type"))
 
         except (httpx.ConnectError, httpx.ConnectTimeout):
             return None

@@ -46,20 +46,21 @@ class WallabagArticleFetcher:
 
         return Article(**dest_dict)
 
-    def get_all_unread(self):
+    async def get_all_unread(self):
         "get all the unread articles from Wallabag."
-        article_data = self.wallabag.get_unread_articles()
-
+        article_data = await self.wallabag.get_unread_articles()
         return [self.wallabag_entry_to_article(article) for article in article_data]
 
-    def get_by_id(self, article_id):
+    async def get_by_id(self, article_id):
         """
         get an article by it's id.
 
         Return None if it doesn't exist.
         """
         articles_found = [
-            article for article in self.get_all_unread() if article.id == article_id
+            article
+            for article in await self.get_all_unread()
+            if article.id == article_id
         ]
         if len(articles_found) == 1:
             return articles_found[0]

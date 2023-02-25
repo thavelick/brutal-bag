@@ -56,13 +56,14 @@ def test_serve(mock_create_app):
 
 
 @patch.object(WallabagArticleFetcher, "get_all_unread")
-def test_homepage(get_all_unread, client):
+async def test_homepage(get_all_unread, client):
     "test the homepage"
 
     get_all_unread.return_value = sample_articles
-    response = client.get("/")
+    response = await client.get("/")
+
     assert response.status_code == 200
-    html = response.data.decode()
+    html = (await response.data).decode()
     assert "Brutal<span>Bag</span>" in html
 
     assert "Elvis Presley is alive and living in a cave" in html
@@ -74,42 +75,42 @@ def test_homepage(get_all_unread, client):
 
 
 @patch.object(WallabagArticleFetcher, "get_all_unread")
-def test_view_article(get_all_unread, client):
+async def test_view_article(get_all_unread, client):
     "test /view/<article_id>"
     get_all_unread.return_value = sample_articles
 
-    response = client.get("/view/1")
+    response = await client.get("/view/1")
     assert response.status_code == 200
-    html = response.data.decode()
+    html = (await response.data).decode()
 
     assert "Elvis Presley is alive and living in a cave" in html
     assert "A hobo wandering" in html
 
 
 @patch.object(WallabagArticleFetcher, "get_all_unread")
-def test_view_article_not_found(get_all_unread, client):
+async def test_view_article_not_found(get_all_unread, client):
     "test missing article on /view/<article_id>"
 
     get_all_unread.return_value = sample_articles
-    response = client.get("/view/999")
+    response = await client.get("/view/999")
     assert response.status_code == 404
-    html = response.data.decode()
+    html = (await response.data).decode()
 
     assert "Not Found" in html
 
 
 @patch.object(WallabagArticleFetcher, "get_all_unread")
 @patch.object(WallabagTagFetcher, "get_all")
-def test_tags(get_all_tags, get_all_unread, client):
+async def test_tags(get_all_tags, get_all_unread, client):
     "test /tags"
     get_all_unread.return_value = sample_articles
     get_all_tags.return_value = [
         Tag(id="1", label="Blogs", slug="blogs", unread_count=0),
     ]
 
-    response = client.get("/tags")
+    response = await client.get("/tags")
     assert response.status_code == 200
-    html = response.data.decode()
+    html = (await response.data).decode()
 
     assert "Blogs" in html
 
@@ -121,11 +122,11 @@ def test_tags(get_all_tags, get_all_unread, client):
         (None, "/static/favicon.ico"),
     ],
 )
-def test_favicon(client, mocker, favicon_url, expected_location):
+async def test_favicon(client, mocker, favicon_url, expected_location):
     domain = "example.com"
     mocker.patch("brutal_bag.cli.get_favicon_url", return_value=favicon_url)
 
-    response = client.get(f"/favicon/{domain}")
+    response = await client.get(f"/favicon/{domain}")
 
     assert response.status_code == 302
     assert response.headers["Location"] == expected_location

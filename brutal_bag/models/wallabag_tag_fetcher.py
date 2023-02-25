@@ -6,11 +6,13 @@ class WallabagTagFetcher:
     def __init__(self, wallabag):
         self.wallabag = wallabag
 
-    def get_all(self):
+    async def get_all(self):
         "get all the tags from Wallabag."
-        tag_data = self.wallabag.get_all_tags()
+        tag_data = await self.wallabag.get_all_tags()
 
-        all_unread_articles = WallabagArticleFetcher(self.wallabag).get_all_unread()
+        all_unread_articles = await WallabagArticleFetcher(
+            self.wallabag
+        ).get_all_unread()
         tags = []
         for tag_dict in tag_data:
             tag_dict["unread_count"] = len(

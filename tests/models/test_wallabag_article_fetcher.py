@@ -8,7 +8,7 @@ from brutal_bag.models.wallabag_article_fetcher import WallabagArticleFetcher
 @pytest.fixture(name="wallabag_article_fetcher")
 def wallabag_article_fetcher_fixture(elvis_entry, yeti_entry):
     class MockWallabag:
-        def get_unread_articles(self):
+        async def get_unread_articles(self):
             return [elvis_entry, yeti_entry]
 
     return WallabagArticleFetcher(MockWallabag())
@@ -56,8 +56,8 @@ def test_wallabag_entry_to_article(elvis_entry):
     assert tag.slug == "cave"
 
 
-def test_get_all_unread(wallabag_article_fetcher):
-    articles = wallabag_article_fetcher.get_all_unread()
+async def test_get_all_unread(wallabag_article_fetcher):
+    articles = await wallabag_article_fetcher.get_all_unread()
     assert len(articles) == 2
     assert articles[0].id == "1"
     assert articles[1].id == "2"
@@ -70,8 +70,8 @@ def test_get_all_unread(wallabag_article_fetcher):
         ("2", "2", "A Yeti was seen on the New Jersey Turnpike"),
     ],
 )
-def test_get_by_id(wallabag_article_fetcher, id, expected_id, expected_title):
-    article = wallabag_article_fetcher.get_by_id(id)
+async def test_get_by_id(wallabag_article_fetcher, id, expected_id, expected_title):
+    article = await wallabag_article_fetcher.get_by_id(id)
     assert article
     assert article.id == expected_id
     assert article.title == expected_title

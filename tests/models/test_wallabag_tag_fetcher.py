@@ -6,10 +6,10 @@ from brutal_bag.models.wallabag_tag_fetcher import WallabagTagFetcher
 @pytest.fixture(name="wallabag_tag_fetcher")
 def wallabag_tag_fetcher_fixture():
     class MockWallabag:
-        def get_unread_articles(self):
+        async def get_unread_articles(self):
             return []
 
-        def get_all_tags(self):
+        async def get_all_tags(self):
             return [
                 {"id": "1", "label": "Cave", "slug": "cave"},
                 {"id": "2", "label": "Yeti", "slug": "yeti"},
@@ -18,8 +18,8 @@ def wallabag_tag_fetcher_fixture():
     return WallabagTagFetcher(MockWallabag())
 
 
-def test_get_all(wallabag_tag_fetcher):
-    tags = wallabag_tag_fetcher.get_all()
+async def test_get_all(wallabag_tag_fetcher):
+    tags = await wallabag_tag_fetcher.get_all()
     assert len(tags) == 2
     assert tags[0].id == "1"
     assert tags[0].label == "Cave"
