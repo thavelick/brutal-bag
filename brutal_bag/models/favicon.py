@@ -30,13 +30,10 @@ def get_favicon_url(article_url):
     "Get the favicon URL for an article URL"
     try:
         response = httpx.get(article_url)
+        print(response.headers.get("content-type"))
+
     except (httpx.ConnectError, httpx.ConnectTimeout):
         return None
-    # # Call the route with a domain parameter
-    # response = client.get("/favicon/example.com")
-
-    # # Check that the response status code is 302 (redirect)
-    # assert response.status_code == 302
 
     parser = FaviconParser(article_url)
     parser.feed(response.text)
@@ -51,6 +48,8 @@ def get_favicon_url(article_url):
             # some sites have a 0 byte favicon.ico, so check the content length
             if response.headers.get("content-length") == "0":
                 return None
+            print(response.headers.get("content-type"))
+
         except (httpx.ConnectError, httpx.ConnectTimeout):
             return None
 

@@ -121,9 +121,7 @@ def test_tags(get_all_tags, get_all_unread, client):
         (None, "/static/favicon.ico"),
     ],
 )
-def test_favicon_route_returns_static_favicon(
-    client, mocker, favicon_url, expected_location
-):
+def test_favicon(client, mocker, favicon_url, expected_location):
     domain = "example.com"
     mocker.patch("brutal_bag.cli.get_favicon_url", return_value=favicon_url)
 
