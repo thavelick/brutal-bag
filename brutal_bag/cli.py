@@ -11,7 +11,6 @@ from flask_caching import Cache
 
 from .models.favicon import get_favicon_url
 from .models.wallabag import Wallabag
-from .models.wallabag_async import WallabagAsync
 from .models.wallabag_article_fetcher import WallabagArticleFetcher
 from .models.wallabag_tag_fetcher import WallabagTagFetcher
 
@@ -21,13 +20,12 @@ def create_app():
     app = Quart(__name__)
     app.config["CACHE_TYPE"] = "SimpleCache"
     cache = Cache(app)
-    wallabag = Wallabag()
 
-    wallabag_async = WallabagAsync()
+    wallabag = Wallabag()
 
     @cache.cached(timeout=60)
     async def get_all_unread():
-        return await WallabagArticleFetcher(wallabag_async).get_all_unread()
+        return await WallabagArticleFetcher(wallabag).get_all_unread()
 
     @app.context_processor
     def count_unread():
@@ -55,13 +53,13 @@ def create_app():
     async def tags():
         "List all tags"
         return await render_template(
-            "tags.html", tags=await WallabagTagFetcher(wallabag_async).get_all()
+            "tags.html", tags=await WallabagTagFetcher(wallabag).get_all()
         )
 
     @app.route("/view/<article_id>")
     async def view_article(article_id):
         "View an article's content"
-        article = await WallabagArticleFetcher(wallabag_async).get_by_id(article_id)
+        article = await WallabagArticleFetcher(wallabag).get_by_id(article_id)
 
         if not article:
             raise NotFound
