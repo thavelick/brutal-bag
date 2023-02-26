@@ -70,3 +70,16 @@ class Wallabag:
         await self.connect()
         tags = await self.wallabag_api.get_tags()
         return tags
+
+    async def get_article_count(self, unread=True, tag=None):
+        "get the number of articles in Wallabag for given parameters."
+        await self.connect()
+        parameters = {
+            "archive": 0 if unread else 1,
+            "perPage": 1,
+        }
+        if tag:
+            parameters["tags"] = [tag]
+
+        response = await self.wallabag_api.get_entries(**parameters)
+        return response["total"]

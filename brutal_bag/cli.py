@@ -28,15 +28,19 @@ def create_app():
         return await WallabagArticleFetcher(wallabag).get_all_unread()
 
     @app.context_processor
-    def count_unread():
+    async def count_unread():
         "Count the number of unread articles"
 
-        return {"count_unread": len(get_all_unread())}
+        return {
+            "count_unread": await WallabagArticleFetcher(wallabag).get_count(
+                unread=True
+            )
+        }
 
     @app.route("/")
     async def homepage():
         "Homepage"
-        return await render_template("index.html", articles=get_all_unread())
+        return await render_template("articles.html", articles=get_all_unread())
 
     @app.route("/favicon/<domain>")
     async def favicon(domain):

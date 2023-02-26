@@ -6,6 +6,9 @@ from brutal_bag.models.wallabag_tag_fetcher import WallabagTagFetcher
 @pytest.fixture(name="wallabag_tag_fetcher")
 def wallabag_tag_fetcher_fixture():
     class MockWallabag:
+        async def get_article_count(self, unread=True, tag=None):
+            return 0
+
         async def get_unread_articles(self):
             return []
 

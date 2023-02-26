@@ -6,12 +6,12 @@ from brutal_bag.models.wallabag_article_fetcher import WallabagArticleFetcher
 
 
 @pytest.fixture(name="wallabag_article_fetcher")
-def wallabag_article_fetcher_fixture(elvis_entry, yeti_entry):
-    class MockWallabag:
-        async def get_unread_articles(self):
-            return [elvis_entry, yeti_entry]
+def wallabag_article_fetcher_fixture(mocker, elvis_entry, yeti_entry):
+    wallabag = mocker.AsyncMock()
+    wallabag.get_unread_articles.return_value = [elvis_entry, yeti_entry]
+    wallabag.get_article_count.return_value = 10
 
-    return WallabagArticleFetcher(MockWallabag())
+    return WallabagArticleFetcher(wallabag)
 
 
 @pytest.fixture(name="elvis_entry")
@@ -75,3 +75,8 @@ async def test_get_by_id(wallabag_article_fetcher, id, expected_id, expected_tit
     assert article
     assert article.id == expected_id
     assert article.title == expected_title
+
+
+async def test_get_count(wallabag_article_fetcher):
+    count = await wallabag_article_fetcher.get_count()
+    assert count == 10

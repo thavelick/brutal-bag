@@ -60,6 +60,9 @@ async def test_homepage(mocker, client):
     mocker.patch.object(
         WallabagArticleFetcher, "get_all_unread", return_value=sample_articles
     )
+    mocker.patch.object(
+        WallabagArticleFetcher, "get_count", return_value=len(sample_articles)
+    )
     response = await client.get("/")
 
     assert response.status_code == 200
@@ -78,6 +81,9 @@ async def test_view_article(mocker, client):
     "test /view/<article_id>"
     mocker.patch.object(
         WallabagArticleFetcher, "get_all_unread", return_value=sample_articles
+    )
+    mocker.patch.object(
+        WallabagArticleFetcher, "get_count", return_value=len(sample_articles)
     )
 
     response = await client.get("/view/1")
@@ -104,19 +110,19 @@ async def test_view_article_not_found(mocker, client):
 async def test_tags(mocker, client):
     "test /tags"
     mocker.patch.object(
-        WallabagArticleFetcher, "get_all_unread", return_value=sample_articles
-    )
-    mocker.patch.object(
         WallabagTagFetcher,
         "get_all",
-        return_value=[Tag(id="1", label="Blogs", slug="blogs")],
+        return_value=[Tag(id="1", label="Blogs", slug="blogs", unread_count=555)],
     )
+    mocker.patch.object(WallabagArticleFetcher, "get_count", return_value=222)
 
     response = await client.get("/tags")
     assert response.status_code == 200
     html = (await response.data).decode()
 
     assert "Blogs" in html
+    assert "222" in html
+    assert "555" in html
 
 
 @pytest.mark.parametrize(

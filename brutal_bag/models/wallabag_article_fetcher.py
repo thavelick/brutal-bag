@@ -46,6 +46,10 @@ class WallabagArticleFetcher:
 
         return Article(**dest_dict)
 
+    async def get_count(self, unread=True, tag_name=None):
+        "get the number of articles in Wallabag for given parameters."
+        return await self.wallabag.get_article_count(unread=unread, tag=tag_name)
+
     async def get_all_unread(self):
         "get all the unread articles from Wallabag."
         article_data = await self.wallabag.get_unread_articles()
