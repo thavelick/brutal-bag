@@ -1,51 +1,47 @@
-from unittest import mock
-
 import httpx
-import pytest
 
 from brutal_bag.models.favicon import get_favicon_url
 
 
-@mock.patch("httpx.get")
-def test_get_favicon_url_with_valid_url(mock_get):
-    mock_response = mock.MagicMock()
-    mock_response.text = '<html><head><link rel="shortcut icon" href="/favicon.ico"></head><body></body></html>'
-    mock_get.return_value = mock_response
+def test_get_favicon_url_with_valid_url(mocker):
+    mock_response = mocker.Mock()
+    mock_response.text = '<link rel="shortcut icon" href="/favicon.foo">'
+    mocker.patch("httpx.get", return_value=mock_response)
 
-    url = "https://www.example.com"
-    assert get_favicon_url(url) == "https://www.example.com/favicon.ico"
-
-
-@mock.patch("httpx.get")
-def test_get_favicon_url_with_invalid_url(mock_get):
-    mock_get.side_effect = httpx.ConnectError("Failed to connect")
-
-    url = "https://invalid.url"
-    assert get_favicon_url(url) is None
+    assert (
+        get_favicon_url("https://www.example.com")
+        == "https://www.example.com/favicon.foo"
+    )
 
 
-@mock.patch("httpx.head")
-def test_get_favicon_url_with_empty_favicon(mock_head):
-    mock_response = mock.MagicMock()
-    mock_response.headers.get.return_value = "0"
-    mock_head.return_value = mock_response
+def test_get_favicon_url_with_invalid_url(mocker):
+    mocker.patch("httpx.get", side_effect=httpx.ConnectError("Failed to connect"))
 
-    url = "https://www.example.com"
-    assert get_favicon_url(url) is None
+    assert get_favicon_url("https://invalid.url") is None
 
 
-@mock.patch("httpx.get")
-@mock.patch("httpx.head")
-def test_page_has_no_link_tag_but_has_default_favicon(mock_head, mock_get):
+def test_get_favicon_url_with_empty_favicon(mocker):
+    mock_get_response = mocker.Mock()
+    mock_get_response.text = "nothing special"
+    mocker.patch("httpx.get", return_value=mock_get_response)
+
+    mock_head_response = mocker.Mock()
+    mock_head_response.headers = {"content-length": "0"}
+    mocker.patch("httpx.head", return_value=mock_head_response)
+
+    assert get_favicon_url("https://www.example.com") is None
+
+
+def test_page_has_no_link_tag_but_has_default_favicon(mocker):
     # set up mock http response that does not have any link tag
-    mock_get_response = mock.MagicMock()
+    mock_get_response = mocker.Mock()
     mock_get_response.text = "<html><head></head><body></body></html>"
-    mock_get.return_value = mock_get_response
+    mocker.patch("httpx.get", return_value=mock_get_response)
 
     # set up mock http response for standard favicon URL
-    mock_head_response = mock.MagicMock()
-    mock_head_response.headers.get.return_value = "1"
-    mock_head.return_value = mock_head_response
+    mock_head_response = mocker.Mock()
+    mock_head_response.headers = {"content-length": "123"}
+    mocker.patch("httpx.head", return_value=mock_head_response)
 
     assert (
         get_favicon_url("https://example.com/article")
@@ -53,15 +49,13 @@ def test_page_has_no_link_tag_but_has_default_favicon(mock_head, mock_get):
     )
 
 
-@mock.patch("httpx.get")
-@mock.patch("httpx.head")
-def test_page_has_no_link_and_default_favicon_error(mock_head, mock_get):
+def test_page_has_no_link_and_default_favicon_error(mocker):
     # set up mock http response that does not have any link tag
-    mock_get_response = mock.MagicMock()
+    mock_get_response = mocker.Mock()
     mock_get_response.text = "<html><head></head><body></body></html>"
-    mock_get.return_value = mock_get_response
 
-    # set up mock http response for standard favicon URL
-    mock_head.side_effect = httpx.ConnectError("Failed to connect")
+    mocker.patch("httpx.get", return_value=mock_get_response)
+    # set up mock http response to error for standard favicon URL
+    mocker.patch("httpx.head", side_effect=httpx.ConnectError("Failed to connect"))
 
     assert get_favicon_url("https://example.com/article") is None

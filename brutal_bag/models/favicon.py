@@ -14,10 +14,8 @@ class FaviconParser(HTMLParser):
         self.source_url = source_url
 
     def handle_starttag(self, tag, attrs):
-        if (
-            tag == "link"
-            and ("rel", "icon") in attrs
-            or ("rel", "shortcut icon") in attrs
+        if tag == "link" and (
+            ("rel", "icon") in attrs or ("rel", "shortcut icon") in attrs
         ):
             self.favicon_url = dict(attrs)["href"]
             if not urllib.parse.urlparse(self.favicon_url).netloc:

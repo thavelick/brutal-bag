@@ -1,12 +1,11 @@
 "general tests for brutal_bag"
-from unittest.mock import patch
 
 from click.testing import CliRunner
 import pytest
-from pytest_mock import mocker
+
+
 from brutal_bag.cli import cli
 from brutal_bag.cli import create_app
-
 from brutal_bag.models.article import Article
 from brutal_bag.models.tag import Tag
 from brutal_bag.models.wallabag_article_fetcher import WallabagArticleFetcher
@@ -45,9 +44,9 @@ def test_version():
     assert result.output.startswith("cli, version ")
 
 
-@patch("brutal_bag.cli.create_app")
-def test_serve(mock_create_app):
+def test_serve(mocker):
     "test the serve command"
+    mock_create_app = mocker.patch("brutal_bag.cli.create_app")
     mock_app = mock_create_app.return_value
     runner = CliRunner()
     result = runner.invoke(cli, "serve")
@@ -55,11 +54,12 @@ def test_serve(mock_create_app):
     assert result.exit_code == 0
 
 
-@patch.object(WallabagArticleFetcher, "get_all_unread")
-async def test_homepage(get_all_unread, client):
+async def test_homepage(mocker, client):
     "test the homepage"
 
-    get_all_unread.return_value = sample_articles
+    mocker.patch.object(
+        WallabagArticleFetcher, "get_all_unread", return_value=sample_articles
+    )
     response = await client.get("/")
 
     assert response.status_code == 200
@@ -74,10 +74,11 @@ async def test_homepage(get_all_unread, client):
     assert "/view/2" in html
 
 
-@patch.object(WallabagArticleFetcher, "get_all_unread")
-async def test_view_article(get_all_unread, client):
+async def test_view_article(mocker, client):
     "test /view/<article_id>"
-    get_all_unread.return_value = sample_articles
+    mocker.patch.object(
+        WallabagArticleFetcher, "get_all_unread", return_value=sample_articles
+    )
 
     response = await client.get("/view/1")
     assert response.status_code == 200
@@ -87,11 +88,12 @@ async def test_view_article(get_all_unread, client):
     assert "A hobo wandering" in html
 
 
-@patch.object(WallabagArticleFetcher, "get_all_unread")
-async def test_view_article_not_found(get_all_unread, client):
+async def test_view_article_not_found(mocker, client):
     "test missing article on /view/<article_id>"
+    mocker.patch.object(
+        WallabagArticleFetcher, "get_all_unread", return_value=sample_articles
+    )
 
-    get_all_unread.return_value = sample_articles
     response = await client.get("/view/999")
     assert response.status_code == 404
     html = (await response.data).decode()
@@ -99,14 +101,16 @@ async def test_view_article_not_found(get_all_unread, client):
     assert "Not Found" in html
 
 
-@patch.object(WallabagArticleFetcher, "get_all_unread")
-@patch.object(WallabagTagFetcher, "get_all")
-async def test_tags(get_all_tags, get_all_unread, client):
+async def test_tags(mocker, client):
     "test /tags"
-    get_all_unread.return_value = sample_articles
-    get_all_tags.return_value = [
-        Tag(id="1", label="Blogs", slug="blogs", unread_count=0),
-    ]
+    mocker.patch.object(
+        WallabagArticleFetcher, "get_all_unread", return_value=sample_articles
+    )
+    mocker.patch.object(
+        WallabagTagFetcher,
+        "get_all",
+        return_value=[Tag(id="1", label="Blogs", slug="blogs")],
+    )
 
     response = await client.get("/tags")
     assert response.status_code == 200
