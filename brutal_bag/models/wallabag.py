@@ -1,4 +1,3 @@
-import json
 import os
 import time
 from wallabagapi import WallabagAPI
@@ -10,6 +9,21 @@ class MissingEnvironment(Exception):
 
 class Wallabag:
     def __init__(self):
+        environment = self.get_environment()
+        self.client_id = environment.get("WALLABAG_CLIENT_ID")
+        self.client_secret = environment.get("WALLABAG_CLIENT_SECRET")
+        self.password = environment.get("WALLABAG_PASSWORD")
+        self.url = environment.get("WALLABAG_URL")
+        self.username = environment.get("WALLABAG_USERNAME")
+
+        self.wallabag_api = None
+        self.token = None
+        self.token_expires_at = None
+
+    def get_environment(self):
+        return os.environ
+
+    def check_environment(self):
         for required_env in [
             "WALLABAG_CLIENT_ID",
             "WALLABAG_CLIENT_SECRET",
@@ -17,21 +31,14 @@ class Wallabag:
             "WALLABAG_URL",
             "WALLABAG_USERNAME",
         ]:
-            if required_env not in os.environ:
+            if required_env not in self.get_environment():
                 raise MissingEnvironment(
                     f"Missing required environment variable {required_env}"
                 )
 
-        self.client_id = os.environ["WALLABAG_CLIENT_ID"]
-        self.client_secret = os.environ["WALLABAG_CLIENT_SECRET"]
-        self.password = os.environ["WALLABAG_PASSWORD"]
-        self.url = os.environ["WALLABAG_URL"]
-        self.username = os.environ["WALLABAG_USERNAME"]
-        self.wallabag = None
-        self.token = None
-        self.token_expires_at = None
-
     async def connect(self):
+        self.check_environment()
+
         if self.token and self.token_expires_at > time.time():
             return
 
@@ -43,7 +50,7 @@ class Wallabag:
             client_secret=self.client_secret,
         )
 
-        self.wallabag = WallabagAPI(
+        self.wallabag_api = WallabagAPI(
             host=self.url,
             client_id=self.client_id,
             client_secret=self.client_secret,
@@ -55,11 +62,11 @@ class Wallabag:
 
     async def get_unread_articles(self):
         await self.connect()
-        response = await self.wallabag.get_entries(archive=0)
+        response = await self.wallabag_api.get_entries(archive=0)
         articles = response["_embedded"]["items"]
         return articles
 
     async def get_all_tags(self):
         await self.connect()
-        tags = await self.wallabag.get_tags()
+        tags = await self.wallabag_api.get_tags()
         return tags
