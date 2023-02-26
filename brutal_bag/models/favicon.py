@@ -24,29 +24,30 @@ class FaviconParser(HTMLParser):
                 )
 
 
-def get_favicon_url(article_url):
+async def get_favicon_url(article_url):
     "Get the favicon URL for an article URL"
-    try:
-        response = httpx.get(article_url)
-
-    except (httpx.ConnectError, httpx.ConnectTimeout):
-        return None
-
-    parser = FaviconParser(article_url)
-    parser.feed(response.text)
-    if parser.favicon_url:
-        return parser.favicon_url
-    else:
-        site_url = article_url.split("/", 3)[2]
-
-        standard_favicon_url = f"https://{site_url}/favicon.ico"
+    async with httpx.AsyncClient() as client:
         try:
-            response = httpx.head(standard_favicon_url)
-            # some sites have a 0 byte favicon.ico, so check the content length
-            if response.headers.get("content-length") == "0":
-                return None
+            response = await client.get(article_url)
 
         except (httpx.ConnectError, httpx.ConnectTimeout):
             return None
 
-        return standard_favicon_url
+        parser = FaviconParser(article_url)
+        parser.feed(response.text)
+        if parser.favicon_url:
+            return parser.favicon_url
+        else:
+            site_url = article_url.split("/", 3)[2]
+
+            standard_favicon_url = f"https://{site_url}/favicon.ico"
+            try:
+                response = await client.head(standard_favicon_url)
+                # some sites have a 0 byte favicon.ico, so check the content length
+                if response.headers.get("content-length") == "0":
+                    return None
+
+            except (httpx.ConnectError, httpx.ConnectTimeout):
+                return None
+
+            return standard_favicon_url

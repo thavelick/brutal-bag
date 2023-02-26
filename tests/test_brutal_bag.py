@@ -132,11 +132,13 @@ async def test_tags(mocker, client):
         (None, "/static/favicon.ico"),
     ],
 )
-async def test_favicon(client, mocker, favicon_url, expected_location):
-    domain = "example.com"
-    mocker.patch("brutal_bag.cli.get_favicon_url", return_value=favicon_url)
+async def test_favicon_async(client, mocker, favicon_url, expected_location):
+    mocker.patch(
+        "brutal_bag.cli.get_favicon_url",
+        return_value=favicon_url,
+    )
 
-    response = await client.get(f"/favicon/{domain}")
+    response = await client.get("/favicon/example.com")
 
     assert response.status_code == 302
     assert response.headers["Location"] == expected_location

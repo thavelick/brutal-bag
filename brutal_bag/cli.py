@@ -1,13 +1,10 @@
 """The command line interface for brutal_bag"""
-import asyncio
-
 
 import click
 import quart.flask_patch
 
 from quart import Quart, render_template, redirect
 from werkzeug.exceptions import NotFound
-from flask_caching import Cache
 
 from .models.favicon import get_favicon_url
 from .models.wallabag import Wallabag
@@ -18,14 +15,8 @@ from .models.wallabag_tag_fetcher import WallabagTagFetcher
 def create_app():
     "Create the flask app"
     app = Quart(__name__)
-    app.config["CACHE_TYPE"] = "SimpleCache"
-    cache = Cache(app)
 
     wallabag = Wallabag()
-
-    @cache.cached(timeout=60)
-    async def get_all_unread():
-        return await WallabagArticleFetcher(wallabag).get_all_unread()
 
     @app.context_processor
     async def count_unread():
@@ -40,12 +31,15 @@ def create_app():
     @app.route("/")
     async def homepage():
         "Homepage"
-        return await render_template("articles.html", articles=get_all_unread())
+        return await render_template(
+            "articles.html",
+            articles=await WallabagArticleFetcher(wallabag).get_all_unread(),
+        )
 
     @app.route("/favicon/<domain>")
     async def favicon(domain):
         url = f"https://{domain}"
-        favicon_url = get_favicon_url(url)
+        favicon_url = await get_favicon_url(url)
         if not favicon_url:
             favicon_url = "/static/favicon.ico"
 

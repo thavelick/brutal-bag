@@ -39,7 +39,15 @@ setup(
         "humanize",
         "wallabagapi",
     ],
-    extras_require={"test": ["pytest", "pytest-asyncio", "pytest-cov", "pytest-mock"]},
+    extras_require={
+        "test": [
+            "pytest",
+            "pytest-asyncio",
+            "pytest-cov",
+            "pytest-httpx",
+            "pytest-mock",
+        ]
+    },
     python_requires=">=3.8",
     package_data={"brutal_bag": ["templates/*.html", "static/*", "models/*.py"]},
     include_package_data=True,
