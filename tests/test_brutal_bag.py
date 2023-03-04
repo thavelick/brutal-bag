@@ -124,6 +124,26 @@ async def test_tags(mocker, client):
     assert "555" in html
 
 
+async def test_tag_entries(mocker, client):
+    "test /tag/<tag_slug>/entries"
+    mocker.patch.object(
+        WallabagArticleFetcher,
+        "get_all_unread_by_tag",
+        return_value=sample_articles,
+    )
+
+    mocker.patch.object(WallabagArticleFetcher, "get_count", return_value=111)
+
+    response = await client.get("/tag/blogs/entries")
+    assert response.status_code == 200
+    html = (await response.data).decode()
+
+    assert "Elvis Presley is alive and living in a cave" in html
+    assert "A Yeti was seen on the New Jersey Turnpike" in html
+    assert "blogs" in html
+    assert "111" in html
+
+
 @pytest.mark.parametrize(
     "favicon_url, expected_location",
     [

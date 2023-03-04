@@ -18,7 +18,7 @@
     <article role="article" class="item {% if tag.unread_count > 0 %}category-has-unread{% endif %}">
         <div class="item-header" dir="auto">
             <span class="item-title">
-                <a href="/tag/{{ tag.id }}/entries">{{ tag.label }}</a>
+                <a href="/tag/{{ tag.slug }}/entries">{{ tag.label }}</a>
             </span>
             (<span title="Number of unread entries">{{ tag.unread_count }}</span>)
         </div>
@@ -30,7 +30,7 @@
             </ul> -->
             <ul class="item-meta-icons">
                 <li>
-                    <a href="/tag/{{ tag.id }}/entries"><svg class="icon" aria-hidden="true">
+                    <a href="/tag/{{ tag.slug }}/entries"><svg class="icon" aria-hidden="true">
                             <use xlink:href="/static/icon/sprite.svg#icon-entries" />
                         </svg><span class="icon-label">Articles</span></a>
                 </li>
@@ -49,7 +49,7 @@
                 <li>
                     <a href="#" data-confirm="true" data-label-question="Are you sure?" data-label-yes="yes"
                         data-label-no="no" data-label-loading="In progress..."
-                        data-url="/tag/{{ tag.id }}/mark-all-as-read"><svg class="icon" aria-hidden="true">
+                        data-url="/tag/{{ tag.slug }}/mark-all-as-read"><svg class="icon" aria-hidden="true">
                             <use xlink:href="/static/icon/sprite.svg#icon-read" />
                         </svg><span class="icon-label">Mark all as read</span></a>
                 </li>

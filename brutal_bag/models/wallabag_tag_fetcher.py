@@ -9,14 +9,17 @@ class WallabagTagFetcher:
 
     async def get_all(self):
         "get all the tags, with counts, from Wallabag."
-        tag_dicts = await self.wallabag.get_all_tags()
-        tags = [Tag(**tag_dict) for tag_dict in tag_dicts]
-        tags.sort(key=lambda tag: tag.label)
 
-        tasks = [
-            self.wallabag.get_article_count(unread=True, tag=tag.label) for tag in tags
-        ]
-        for i, task in enumerate(asyncio.as_completed(tasks)):
-            tags[i].unread_count = await task
+        async def tag_from_dict(tag_dict):
+            tag = Tag(**tag_dict)
+            tag.unread_count = await self.wallabag.get_article_count(
+                unread=True, tag=tag.label
+            )
+            return tag
+
+        tag_dicts = await self.wallabag.get_all_tags()
+
+        tasks = [tag_from_dict(tag_dict) for tag_dict in tag_dicts]
+        tags = await asyncio.gather(*tasks)
 
         return tags

@@ -9,6 +9,7 @@ from brutal_bag.models.wallabag_article_fetcher import WallabagArticleFetcher
 def wallabag_article_fetcher_fixture(mocker, elvis_entry, yeti_entry):
     wallabag = mocker.AsyncMock()
     wallabag.get_unread_articles.return_value = [elvis_entry, yeti_entry]
+    wallabag.get_unread_articles_by_tag.return_value = [yeti_entry]
     wallabag.get_article_count.return_value = 10
     wallabag.get_article_by_id.return_value = elvis_entry
 
@@ -67,6 +68,12 @@ async def test_get_all_unread(wallabag_article_fetcher):
     assert len(articles) == 2
     assert articles[0].id == "1"
     assert articles[1].id == "2"
+
+
+async def test_get_all_unread_by_tag(wallabag_article_fetcher):
+    articles = await wallabag_article_fetcher.get_all_unread_by_tag("yeti")
+    assert len(articles) == 1
+    assert articles[0].id == "2"
 
 
 async def test_get_by_id(wallabag_article_fetcher):

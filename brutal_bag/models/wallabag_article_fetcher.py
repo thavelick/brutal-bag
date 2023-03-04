@@ -58,6 +58,11 @@ class WallabagArticleFetcher:
         article_data = await self.wallabag.get_unread_articles()
         return [self.wallabag_entry_to_article(article) for article in article_data]
 
+    async def get_all_unread_by_tag(self, tag_name):
+        "get all the unread articles from Wallabag that have a given tag."
+        article_data = await self.wallabag.get_unread_articles_by_tag(tag=tag_name)
+        return [self.wallabag_entry_to_article(article) for article in article_data]
+
     async def get_by_id(self, article_id):
         """
         get an article by it's id.

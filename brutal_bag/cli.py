@@ -22,10 +22,9 @@ def create_app():
     async def count_unread():
         "Count the number of unread articles"
 
+        count_unread = await WallabagArticleFetcher(wallabag).get_count(unread=True)
         return {
-            "count_unread": await WallabagArticleFetcher(wallabag).get_count(
-                unread=True
-            )
+            "count_unread": count_unread,
         }
 
     @app.route("/")
@@ -52,6 +51,23 @@ def create_app():
         "List all tags"
         return await render_template(
             "tags.html", tags=await WallabagTagFetcher(wallabag).get_all()
+        )
+
+    @app.route("/tag/<tag_slug>/entries")
+    async def tag_entries(tag_slug):
+        "List all entries for a given tag"
+
+        count_articles = await WallabagArticleFetcher(wallabag).get_count(
+            unread=True, tag_name=tag_slug
+        )
+
+        return await render_template(
+            "articles.html",
+            articles=await WallabagArticleFetcher(wallabag).get_all_unread_by_tag(
+                tag_slug
+            ),
+            article_type=tag_slug,
+            count_articles=count_articles,
         )
 
     @app.route("/view/<article_id>")

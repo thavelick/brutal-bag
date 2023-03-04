@@ -74,6 +74,11 @@ async def test_get_unread_articles(connected_wallabag):
     assert articles == []
 
 
+async def test_get_unread_articles_by_tag(connected_wallabag):
+    articles = await connected_wallabag.get_unread_articles_by_tag("sample")
+    assert articles == []
+
+
 async def test_get_artice_by_id(connected_wallabag):
     article = await connected_wallabag.get_article_by_id(1)
 
