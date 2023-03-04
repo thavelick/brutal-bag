@@ -26,6 +26,7 @@ def wallabag_api_fixtrue(mocker):
     wallabag_api = mocker.AsyncMock()
     wallabag_api.get_entries.return_value = {"_embedded": {"items": []}, "total": 10}
     wallabag_api.get_tags.return_value = []
+    wallabag_api.get_entry.return_value = {}
     return wallabag_api
 
 
@@ -71,6 +72,12 @@ async def test_connect_with_existing_token(wallabag):
 async def test_get_unread_articles(connected_wallabag):
     articles = await connected_wallabag.get_unread_articles()
     assert articles == []
+
+
+async def test_get_artice_by_id(connected_wallabag):
+    article = await connected_wallabag.get_article_by_id(1)
+
+    assert article == {}
 
 
 async def test_get_all_tags(connected_wallabag):

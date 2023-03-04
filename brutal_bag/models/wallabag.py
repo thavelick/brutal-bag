@@ -66,6 +66,11 @@ class Wallabag:
         articles = response["_embedded"]["items"]
         return articles
 
+    async def get_article_by_id(self, article_id):
+        await self.connect()
+        article = await self.wallabag_api.get_entry(article_id)
+        return article
+
     async def get_all_tags(self):
         await self.connect()
         tags = await self.wallabag_api.get_tags()

@@ -10,6 +10,7 @@ def wallabag_article_fetcher_fixture(mocker, elvis_entry, yeti_entry):
     wallabag = mocker.AsyncMock()
     wallabag.get_unread_articles.return_value = [elvis_entry, yeti_entry]
     wallabag.get_article_count.return_value = 10
+    wallabag.get_article_by_id.return_value = elvis_entry
 
     return WallabagArticleFetcher(wallabag)
 
@@ -56,6 +57,11 @@ def test_wallabag_entry_to_article(elvis_entry):
     assert tag.slug == "cave"
 
 
+def test_wallabag_entry_to_article_no_entry():
+    article = WallabagArticleFetcher.wallabag_entry_to_article(None)
+    assert article is None
+
+
 async def test_get_all_unread(wallabag_article_fetcher):
     articles = await wallabag_article_fetcher.get_all_unread()
     assert len(articles) == 2
@@ -63,18 +69,10 @@ async def test_get_all_unread(wallabag_article_fetcher):
     assert articles[1].id == "2"
 
 
-@pytest.mark.parametrize(
-    "id, expected_id, expected_title",
-    [
-        ("1", "1", "Elvis Presley is alive and living in a cave"),
-        ("2", "2", "A Yeti was seen on the New Jersey Turnpike"),
-    ],
-)
-async def test_get_by_id(wallabag_article_fetcher, id, expected_id, expected_title):
-    article = await wallabag_article_fetcher.get_by_id(id)
-    assert article
-    assert article.id == expected_id
-    assert article.title == expected_title
+async def test_get_by_id(wallabag_article_fetcher):
+    article = await wallabag_article_fetcher.get_by_id("1")
+    assert article.id == "1"
+    assert article.title == "Elvis Presley is alive and living in a cave"
 
 
 async def test_get_count(wallabag_article_fetcher):

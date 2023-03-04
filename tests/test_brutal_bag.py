@@ -79,8 +79,9 @@ async def test_homepage(mocker, client):
 
 async def test_view_article(mocker, client):
     "test /view/<article_id>"
+
     mocker.patch.object(
-        WallabagArticleFetcher, "get_all_unread", return_value=sample_articles
+        WallabagArticleFetcher, "get_by_id", return_value=sample_articles[0]
     )
     mocker.patch.object(
         WallabagArticleFetcher, "get_count", return_value=len(sample_articles)
@@ -96,9 +97,7 @@ async def test_view_article(mocker, client):
 
 async def test_view_article_not_found(mocker, client):
     "test missing article on /view/<article_id>"
-    mocker.patch.object(
-        WallabagArticleFetcher, "get_all_unread", return_value=sample_articles
-    )
+    mocker.patch.object(WallabagArticleFetcher, "get_by_id", return_value=None)
 
     response = await client.get("/view/999")
     assert response.status_code == 404

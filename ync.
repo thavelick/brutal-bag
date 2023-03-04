@@ -1,0 +1,250 @@
+[33mcommit c80645549c5d674f3c5ddc03a3463b7c8c1bd3cb[m[33m ([m[1;32mmain[m[33m)[m
+Author: Tristan Havelick <tristan@havelick.com>
+Date:   Sun Feb 26 12:26:16 2023 -0700
+
+    make favicon endpoint async.
+    
+    This involved making httpx calls for favicons async as well as
+    using pytest-httpx to make testing sensible
+
+[1mdiff --git a/brutal_bag/cli.py b/brutal_bag/cli.py[m
+[1mindex 97e1cf6..0c41d85 100644[m
+[1m--- a/brutal_bag/cli.py[m
+[1m+++ b/brutal_bag/cli.py[m
+[36m@@ -1,13 +1,10 @@[m
+ """The command line interface for brutal_bag"""[m
+[31m-import asyncio[m
+[31m-[m
+ [m
+ import click[m
+ import quart.flask_patch[m
+ [m
+ from quart import Quart, render_template, redirect[m
+ from werkzeug.exceptions import NotFound[m
+[31m-from flask_caching import Cache[m
+ [m
+ from .models.favicon import get_favicon_url[m
+ from .models.wallabag import Wallabag[m
+[36m@@ -18,15 +15,9 @@[m [mfrom .models.wallabag_tag_fetcher import WallabagTagFetcher[m
+ def create_app():[m
+     "Create the flask app"[m
+     app = Quart(__name__)[m
+[31m-    app.config["CACHE_TYPE"] = "SimpleCache"[m
+[31m-    cache = Cache(app)[m
+ [m
+     wallabag = Wallabag()[m
+ [m
+[31m-    @cache.cached(timeout=60)[m
+[31m-    async def get_all_unread():[m
+[31m-        return await WallabagArticleFetcher(wallabag).get_all_unread()[m
+[31m-[m
+     @app.context_processor[m
+     async def count_unread():[m
+         "Count the number of unread articles"[m
+[36m@@ -40,12 +31,15 @@[m [mdef create_app():[m
+     @app.route("/")[m
+     async def homepage():[m
+         "Homepage"[m
+[31m-        return await render_template("articles.html", articles=get_all_unread())[m
+[32m+[m[32m        return await render_template([m
+[32m+[m[32m            "articles.html",[m
+[32m+[m[32m            articles=await WallabagArticleFetcher(wallabag).get_all_unread(),[m
+[32m+[m[32m        )[m
+ [m
+     @app.route("/favicon/<domain>")[m
+     async def favicon(domain):[m
+         url = f"https://{domain}"[m
+[31m-        favicon_url = get_favicon_url(url)[m
+[32m+[m[32m        favicon_url = await get_favicon_url(url)[m
+         if not favicon_url:[m
+             favicon_url = "/static/favicon.ico"[m
+ [m
+[1mdiff --git a/brutal_bag/models/favicon.py b/brutal_bag/models/favicon.py[m
+[1mindex bb61fd8..6af2790 100644[m
+[1m--- a/brutal_bag/models/favicon.py[m
+[1m+++ b/brutal_bag/models/favicon.py[m
+[36m@@ -24,29 +24,30 @@[m [mclass FaviconParser(HTMLParser):[m
+                 )[m
+ [m
+ [m
+[31m-def get_favicon_url(article_url):[m
+[32m+[m[32masync def get_favicon_url(article_url):[m
+     "Get the favicon URL for an article URL"[m
+[31m-    try:[m
+[31m-        response = httpx.get(article_url)[m
+[31m-[m
+[31m-    except (httpx.ConnectError, httpx.ConnectTimeout):[m
+[31m-        return None[m
+[31m-[m
+[31m-    parser = FaviconParser(article_url)[m
+[31m-    parser.feed(response.text)[m
+[31m-    if parser.favicon_url:[m
+[31m-        return parser.favicon_url[m
+[31m-    else:[m
+[31m-        site_url = article_url.split("/", 3)[2][m
+[31m-[m
+[31m-        standard_favicon_url = f"https://{site_url}/favicon.ico"[m
+[32m+[m[32m    async with httpx.AsyncClient() as client:[m
+         try:[m
+[31m-            response = httpx.head(standard_favicon_url)[m
+[31m-            # some sites have a 0 byte favicon.ico, so check the content length[m
+[31m-            if response.headers.get("content-length") == "0":[m
+[31m-                return None[m
+[32m+[m[32m            response = await client.get(article_url)[m
+ [m
+         except (httpx.ConnectError, httpx.ConnectTimeout):[m
+             return None[m
+ [m
+[31m-        return standard_favicon_url[m
+[32m+[m[32m        parser = FaviconParser(article_url)[m
+[32m+[m[32m        parser.feed(response.text)[m
+[32m+[m[32m        if parser.favicon_url:[m
+[32m+[m[32m            return parser.favicon_url[m
+[32m+[m[32m        else:[m
+[32m+[m[32m            site_url = article_url.split("/", 3)[2][m
+[32m+[m
+[32m+[m[32m            standard_favicon_url = f"https://{site_url}/favicon.ico"[m
+[32m+[m[32m            try:[m
+[32m+[m[32m                response = await client.head(standard_favicon_url)[m
+[32m+[m[32m                # some sites have a 0 byte favicon.ico, so check the content length[m
+[32m+[m[32m                if response.headers.get("content-length") == "0":[m
+[32m+[m[32m                    return None[m
+[32m+[m
+[32m+[m[32m            except (httpx.ConnectError, httpx.ConnectTimeout):[m
+[32m+[m[32m                return None[m
+[32m+[m
+[32m+[m[32m            return standard_favicon_url[m
+[1mdiff --git a/setup.py b/setup.py[m
+[1mindex 2eb7cf4..99e5375 100644[m
+[1m--- a/setup.py[m
+[1m+++ b/setup.py[m
+[36m@@ -39,7 +39,15 @@[m [msetup([m
+         "humanize",[m
+         "wallabagapi",[m
+     ],[m
+[31m-    extras_require={"test": ["pytest", "pytest-asyncio", "pytest-cov", "pytest-mock"]},[m
+[32m+[m[32m    extras_require={[m
+[32m+[m[32m        "test": [[m
+[32m+[m[32m            "pytest",[m
+[32m+[m[32m            "pytest-asyncio",[m
+[32m+[m[32m            "pytest-cov",[m
+[32m+[m[32m            "pytest-httpx",[m
+[32m+[m[32m            "pytest-mock",[m
+[32m+[m[32m        ][m
+[32m+[m[32m    },[m
+     python_requires=">=3.8",[m
+     package_data={"brutal_bag": ["templates/*.html", "static/*", "models/*.py"]},[m
+     include_package_data=True,[m
+[1mdiff --git a/tests/models/test_favicon.py b/tests/models/test_favicon.py[m
+[1mindex b573480..01f2b11 100644[m
+[1m--- a/tests/models/test_favicon.py[m
+[1m+++ b/tests/models/test_favicon.py[m
+[36m@@ -1,61 +1,45 @@[m
+ import httpx[m
+[32m+[m[32mfrom pytest_httpx import HTTPXMock[m
+ [m
+ from brutal_bag.models.favicon import get_favicon_url[m
+ [m
+ [m
+[31m-def test_get_favicon_url_with_valid_url(mocker):[m
+[31m-    mock_response = mocker.Mock()[m
+[31m-    mock_response.text = '<link rel="shortcut icon" href="/favicon.foo">'[m
+[31m-    mocker.patch("httpx.get", return_value=mock_response)[m
+[32m+[m[32masync def test_get_favicon_url_with_valid_url(httpx_mock):[m
+[32m+[m[32m    url = "https://www.example.com"[m
+[32m+[m[32m    response_text = '<link rel="shortcut icon" href="/favicon.foo">'[m
+[32m+[m[32m    httpx_mock.add_response(method="GET", text=response_text)[m
+ [m
+[31m-    assert ([m
+[31m-        get_favicon_url("https://www.example.com")[m
+[31m-        == "https://www.example.com/favicon.foo"[m
+[31m-    )[m
+[31m-[m
+[31m-[m
+[31m-def test_get_favicon_url_with_invalid_url(mocker):[m
+[31m-    mocker.patch("httpx.get", side_effect=httpx.ConnectError("Failed to connect"))[m
+[32m+[m[32m    assert await get_favicon_url(url) == f"{url}/favicon.foo"[m
+ [m
+[31m-    assert get_favicon_url("https://invalid.url") is None[m
+ [m
+[32m+[m[32masync def test_get_favicon_url_with_invalid_url(httpx_mock: HTTPXMock):[m
+[32m+[m[32m    httpx_mock.add_exception(httpx.ConnectError("Failed to connect"))[m
+[32m+[m[32m    assert await get_favicon_url("https://invalid.url") is None[m
+ [m
+[31m-def test_get_favicon_url_with_empty_favicon(mocker):[m
+[31m-    mock_get_response = mocker.Mock()[m
+[31m-    mock_get_response.text = "nothing special"[m
+[31m-    mocker.patch("httpx.get", return_value=mock_get_response)[m
+ [m
+[31m-    mock_head_response = mocker.Mock()[m
+[31m-    mock_head_response.headers = {"content-length": "0"}[m
+[31m-    mocker.patch("httpx.head", return_value=mock_head_response)[m
+[32m+[m[32masync def test_get_favicon_url_with_empty_favicon(httpx_mock):[m
+[32m+[m[32m    httpx_mock.add_response(method="GET", text="nothing special")[m
+[32m+[m[32m    httpx_mock.add_response(method="HEAD", headers={"content-length": "0"})[m
+ [m
+[31m-    assert get_favicon_url("https://www.example.com") is None[m
+[32m+[m[32m    assert await get_favicon_url("https://www.example.com") is None[m
+ [m
+ [m
+[31m-def test_page_has_no_link_tag_but_has_default_favicon(mocker):[m
+[31m-    # set up mock http response that does not have any link tag[m
+[31m-    mock_get_response = mocker.Mock()[m
+[31m-    mock_get_response.text = "<html><head></head><body></body></html>"[m
+[31m-    mocker.patch("httpx.get", return_value=mock_get_response)[m
+[31m-[m
+[31m-    # set up mock http response for standard favicon URL[m
+[31m-    mock_head_response = mocker.Mock()[m
+[31m-    mock_head_response.headers = {"content-length": "123"}[m
+[31m-    mocker.patch("httpx.head", return_value=mock_head_response)[m
+[32m+[m[32masync def test_page_has_no_link_tag_but_has_default_favicon(httpx_mock):[m
+[32m+[m[32m    httpx_mock.add_response([m
+[32m+[m[32m        method="GET", text="<html><head></head><body></body></html>"[m
+[32m+[m[32m    )[m
+[32m+[m[32m    httpx_mock.add_response(method="HEAD", headers={"content-length": "123"})[m
+ [m
+     assert ([m
+[31m-        get_favicon_url("https://example.com/article")[m
+[32m+[m[32m        await get_favicon_url("https://example.com/article")[m
+         == "https://example.com/favicon.ico"[m
+     )[m
+ [m
+ [m
+[31m-def test_page_has_no_link_and_default_favicon_error(mocker):[m
+[31m-    # set up mock http response that does not have any link tag[m
+[31m-    mock_get_response = mocker.Mock()[m
+[31m-    mock_get_response.text = "<html><head></head><body></body></html>"[m
+[31m-[m
+[31m-    mocker.patch("httpx.get", return_value=mock_get_response)[m
+[31m-    # set up mock http response to error for standard favicon URL[m
+[31m-    mocker.patch("httpx.head", side_effect=httpx.ConnectError("Failed to connect"))[m
+[32m+[m[32masync def test_page_has_no_link_and_default_favicon_error(httpx_mock):[m
+[32m+[m[32m    httpx_mock.add_response([m
+[32m+[m[32m        method="GET", text="<html><head></head><body></body></html>"[m
+[32m+[m[32m    )[m
+[32m+[m[32m    httpx_mock.add_exception(httpx.ConnectError("Failed to connect"))[m
+ [m
+[31m-    assert get_favicon_url("https://example.com/article") is None[m
+[32m+[m[32m    assert await get_favicon_url("https://example.com/article") is None[m
+[1mdiff --git a/tests/test_brutal_bag.py b/tests/test_brutal_bag.py[m
+[1mindex 4cf5f6d..af94b32 100644[m
+[1m--- a/tests/test_brutal_bag.py[m
+[1m+++ b/tests/test_brutal_bag.py[m
+[36m@@ -132,11 +132,13 @@[m [masync def test_tags(mocker, client):[m
+         (None, "/static/favicon.ico"),[m
+     ],[m
+ )[m
+[31m-async def test_favicon(client, mocker, favicon_url, expected_location):[m
+[31m-    domain = "example.com"[m
+[31m-    mocker.patch("brutal_bag.cli.get_favicon_url", return_value=favicon_url)[m
+[32m+[m[32masync def test_favicon_async(client, mocker, favicon_url, expected_location):[m
+[32m+[m[32m    mocker.patch([m
+[32m+[m[32m        "brutal_bag.cli.get_favicon_url",[m
+[32m+[m[32m        return_value=favicon_url,[m
+[32m+[m[32m    )[m
+ [m
+[31m-    response = await client.get(f"/favicon/{domain}")[m
+[32m+[m[32m    response = await client.get("/favicon/example.com")[m
+ [m
+     assert response.status_code == 302[m
+     assert response.headers["Location"] == expected_location[m

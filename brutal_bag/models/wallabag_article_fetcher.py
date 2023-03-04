@@ -11,6 +11,9 @@ class WallabagArticleFetcher:
 
     @staticmethod
     def wallabag_entry_to_article(entry):
+        if not entry:
+            return None
+
         dest_dict = {
             key: entry.get(key)
             for key in [
@@ -61,11 +64,5 @@ class WallabagArticleFetcher:
 
         Return None if it doesn't exist.
         """
-        articles_found = [
-            article
-            for article in await self.get_all_unread()
-            if article.id == article_id
-        ]
-        if len(articles_found) == 1:
-            return articles_found[0]
-        return None
+        article_data = await self.wallabag.get_article_by_id(article_id)
+        return self.wallabag_entry_to_article(article_data)
