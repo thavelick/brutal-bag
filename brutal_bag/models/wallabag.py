@@ -7,6 +7,12 @@ class MissingEnvironment(Exception):
     pass
 
 
+class WallabagResultList(list):
+    def __init__(self, items, total):
+        super().__init__(items)
+        self.total = total
+
+
 class Wallabag:
     def __init__(self):
         environment = self.get_environment()
@@ -70,28 +76,17 @@ class Wallabag:
             parameters["tags"] = [tag]
 
         response = await self.wallabag_api.get_entries(**parameters)
-        articles = response["_embedded"]["items"]
-        return articles
+        return WallabagResultList(response["_embedded"]["items"], response["total"])
 
     async def get_article_by_id(self, article_id):
         await self.connect()
-        article = await self.wallabag_api.get_entry(article_id)
-        return article
+        return await self.wallabag_api.get_entry(article_id)
 
     async def get_all_tags(self):
         await self.connect()
-        tags = await self.wallabag_api.get_tags()
-        return tags
+        return await self.wallabag_api.get_tags()
 
     async def get_article_count(self, unread=True, tag=None):
         "get the number of articles in Wallabag for given parameters."
-        await self.connect()
-        parameters = {
-            "archive": 0 if unread else 1,
-            "perPage": 1,
-        }
-        if tag:
-            parameters["tags"] = [tag]
-
-        response = await self.wallabag_api.get_entries(**parameters)
-        return response["total"]
+        result_list = await self.get_articles(unread=unread, tag=tag, per_page=1)
+        return result_list.total
