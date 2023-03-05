@@ -53,14 +53,9 @@ class WallabagArticleFetcher:
         "get the number of articles in Wallabag for given parameters."
         return await self.wallabag.get_article_count(unread=unread, tag=tag_name)
 
-    async def get_all_unread(self):
-        "get all the unread articles from Wallabag."
-        article_data = await self.wallabag.get_unread_articles()
-        return [self.wallabag_entry_to_article(article) for article in article_data]
-
-    async def get_all_unread_by_tag(self, tag_name):
-        "get all the unread articles from Wallabag that have a given tag."
-        article_data = await self.wallabag.get_unread_articles_by_tag(tag=tag_name)
+    async def get_all(self, unread=True, tag_name=None):
+        "get all the articles from Wallabag for given parameters."
+        article_data = await self.wallabag.get_articles(unread=unread, tag=tag_name)
         return [self.wallabag_entry_to_article(article) for article in article_data]
 
     async def get_by_id(self, article_id):

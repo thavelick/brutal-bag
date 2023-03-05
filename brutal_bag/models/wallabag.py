@@ -60,15 +60,16 @@ class Wallabag:
 
         self.token_expires_at = time.time() + 3600
 
-    async def get_unread_articles(self):
+    async def get_articles(self, unread=True, tag=None, per_page=30):
         await self.connect()
-        response = await self.wallabag_api.get_entries(archive=0)
-        articles = response["_embedded"]["items"]
-        return articles
+        parameters = {
+            "archive": 0 if unread else 1,
+            "perPage": per_page,
+        }
+        if tag:
+            parameters["tags"] = [tag]
 
-    async def get_unread_articles_by_tag(self, tag):
-        await self.connect()
-        response = await self.wallabag_api.get_entries(archive=0, tags=[tag])
+        response = await self.wallabag_api.get_entries(**parameters)
         articles = response["_embedded"]["items"]
         return articles
 

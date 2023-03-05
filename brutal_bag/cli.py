@@ -32,7 +32,7 @@ def create_app():
         "Homepage"
         return await render_template(
             "articles.html",
-            articles=await WallabagArticleFetcher(wallabag).get_all_unread(),
+            articles=await WallabagArticleFetcher(wallabag).get_all(unread=True),
         )
 
     @app.route("/favicon/<domain>")
@@ -63,8 +63,8 @@ def create_app():
 
         return await render_template(
             "articles.html",
-            articles=await WallabagArticleFetcher(wallabag).get_all_unread_by_tag(
-                tag_slug
+            articles=await WallabagArticleFetcher(wallabag).get_all(
+                unread=True, tag=tag_slug
             ),
             article_type=tag_slug,
             count_articles=count_articles,

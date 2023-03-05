@@ -69,13 +69,28 @@ async def test_connect_with_existing_token(wallabag):
     assert wallabag.token_expires_at == expiry
 
 
-async def test_get_unread_articles(connected_wallabag):
-    articles = await connected_wallabag.get_unread_articles()
-    assert articles == []
+@pytest.mark.parametrize(
+    "params, expected_params",
+    [
+        (
+            {"unread": True, "tag": "sample", "per_page": 30},
+            {"archive": 0, "perPage": 30, "tags": ["sample"]},
+        ),
+        ({"unread": False, "tag": None, "per_page": 50}, {"archive": 1, "perPage": 50}),
+        ({"unread": True, "tag": None, "per_page": 20}, {"archive": 0, "perPage": 20}),
+        (
+            {"unread": True, "tag": "sample"},
+            {"archive": 0, "perPage": 30, "tags": ["sample"]},
+        ),
+        ({"unread": False, "tag": None}, {"archive": 1, "perPage": 30}),
+        ({"unread": True, "tag": None}, {"archive": 0, "perPage": 30}),
+    ],
+)
+async def test_get_articles(connected_wallabag, wallabag_api, params, expected_params):
+    articles = await connected_wallabag.get_articles(**params)
 
+    wallabag_api.get_entries.assert_called_once_with(**expected_params)
 
-async def test_get_unread_articles_by_tag(connected_wallabag):
-    articles = await connected_wallabag.get_unread_articles_by_tag("sample")
     assert articles == []
 
 

@@ -57,9 +57,7 @@ def test_serve(mocker):
 async def test_homepage(mocker, client):
     "test the homepage"
 
-    mocker.patch.object(
-        WallabagArticleFetcher, "get_all_unread", return_value=sample_articles
-    )
+    mocker.patch.object(WallabagArticleFetcher, "get_all", return_value=sample_articles)
     mocker.patch.object(
         WallabagArticleFetcher, "get_count", return_value=len(sample_articles)
     )
@@ -128,7 +126,7 @@ async def test_tag_entries(mocker, client):
     "test /tag/<tag_slug>/entries"
     mocker.patch.object(
         WallabagArticleFetcher,
-        "get_all_unread_by_tag",
+        "get_all",
         return_value=sample_articles,
     )
 
