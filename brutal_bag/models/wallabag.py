@@ -66,11 +66,12 @@ class Wallabag:
 
         self.token_expires_at = time.time() + 3600
 
-    async def get_articles(self, unread=True, tag=None, per_page=30):
+    async def get_articles(self, unread=True, tag=None, page=1, per_page=30):
         await self.connect()
         parameters = {
             "archive": 0 if unread else 1,
             "perPage": per_page,
+            "page": page,
         }
         if tag:
             parameters["tags"] = [tag]

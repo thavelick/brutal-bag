@@ -74,16 +74,22 @@ async def test_connect_with_existing_token(wallabag):
     [
         (
             {"unread": True, "tag": "sample", "per_page": 30},
-            {"archive": 0, "perPage": 30, "tags": ["sample"]},
+            {"archive": 0, "page": 1, "perPage": 30, "tags": ["sample"]},
         ),
-        ({"unread": False, "tag": None, "per_page": 50}, {"archive": 1, "perPage": 50}),
-        ({"unread": True, "tag": None, "per_page": 20}, {"archive": 0, "perPage": 20}),
+        (
+            {"unread": False, "tag": None, "per_page": 50},
+            {"archive": 1, "page": 1, "perPage": 50},
+        ),
+        (
+            {"unread": True, "tag": None, "per_page": 20},
+            {"archive": 0, "page": 1, "perPage": 20},
+        ),
         (
             {"unread": True, "tag": "sample"},
-            {"archive": 0, "perPage": 30, "tags": ["sample"]},
+            {"archive": 0, "page": 1, "perPage": 30, "tags": ["sample"]},
         ),
-        ({"unread": False, "tag": None}, {"archive": 1, "perPage": 30}),
-        ({"unread": True, "tag": None}, {"archive": 0, "perPage": 30}),
+        ({"unread": False, "tag": None}, {"archive": 1, "page": 1, "perPage": 30}),
+        ({"unread": True, "tag": None}, {"archive": 0, "page": 1, "perPage": 30}),
     ],
 )
 async def test_get_articles(connected_wallabag, wallabag_api, params, expected_params):
