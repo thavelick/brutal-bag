@@ -114,5 +114,21 @@ async def test_get_all_tags(connected_wallabag):
 
 async def test_get_article_count(connected_wallabag):
     count = await connected_wallabag.get_article_count(unread=True, tag="sample")
-
     assert count == 10
+
+
+async def test_add_article(connected_wallabag):
+    await connected_wallabag.add_article("http://example.com")
+    connected_wallabag.wallabag_api.post_entries.assert_called_once_with(
+        "http://example.com"
+    )
+
+
+async def test_set_article_read(connected_wallabag):
+    await connected_wallabag.set_article_read(1, is_read=True)
+    connected_wallabag.wallabag_api.patch_entries.assert_called_once_with(1, archive=1)
+
+
+async def test_set_article_starred(connected_wallabag):
+    await connected_wallabag.set_article_starred(1, is_starred=True)
+    connected_wallabag.wallabag_api.patch_entries.assert_called_once_with(1, starred=1)

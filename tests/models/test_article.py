@@ -12,6 +12,7 @@ def article_fixture():
         title="Elvis Presley is alive and living in a cave",
         content="A hobo wandering",
         external_url="https://www.example.com/1",
+        is_read=False,
         published_by=["Hobo News"],
         date=datetime(2019, 11, 13, 13, 51, 47),
         reading_time=3,
@@ -25,6 +26,7 @@ def test_create(article):
     assert article.title == "Elvis Presley is alive and living in a cave"
     assert article.content == "A hobo wandering"
     assert article.external_url == "https://www.example.com/1"
+    assert article.is_read is False
     assert article.published_by == ["Hobo News"]
     assert article.date == datetime(2019, 11, 13, 13, 51, 47)
     assert article.reading_time == 3
@@ -82,3 +84,23 @@ def test_relative_date_real_time(article):
 def test_external_domain(article, external_url, expected_domain):
     article.external_url = external_url
     assert article.external_domain() == expected_domain
+
+
+def test_read_string_read(article):
+    article.is_read = True
+    assert article.read_string() == "Read"
+
+
+def test_read_string_unread(article):
+    article.is_read = False
+    assert article.read_string() == "Unread"
+
+
+def test_read_string_read_inverse(article):
+    article.is_read = True
+    assert article.read_string(show_inverse=True) == "Unread"
+
+
+def test_read_string_unread_inverse(article):
+    article.is_read = False
+    assert article.read_string(show_inverse=True) == "Read"

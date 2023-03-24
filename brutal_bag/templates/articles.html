@@ -1,6 +1,6 @@
 {# Layout originally taken from the Miniflux project, used under the Apache 2.0 License #}
 {% extends "layout.html" %}
-{% block title %}Unread{% endblock %}
+{% block title %}{{ article_type or "Unread" }}{% endblock %}
 {% block content %}
 
 <section class="page-header">
@@ -38,10 +38,11 @@
 <p class="alert">There are no articles to list.</p>
 {% endif %}
 
-<div class="items hide-read-items">
+<div class="items">
 
     {% for article in articles %}
-    <article role="article" class="item touch-item item-status-unread" data-id="{{ article.id }}">
+    <article role="article" class="item touch-item item-status-{{ article.read_string() | lower }}"
+        data-id="{{ article.id }}">
         <div class="item-header" dir="auto">
             <span class="item-title">
 
@@ -80,15 +81,15 @@
             <ul class="item-meta-icons">
                 <li>
                     <a href="#" title="Change entry status" data-toggle-status="true" data-label-loading="Saving..."
-                        data-label-read="Read" data-label-unread="Unread" data-value="unread"><svg class="icon"
-                            aria-hidden="true">
-                            <use xlink:href="/static/icon/sprite.svg#icon-read" />
-                        </svg><span class="icon-label">Read</span></a>
+                        data-label-read="Read" data-label-unread="Unread"
+                        data-value="{{ article.read_string() | lower }}"><svg class="icon" aria-hidden="true">
+                            <use xlink:href="/static/icon/sprite.svg#icon-{{ article.read_string() | lower }}" />
+                        </svg><span class="icon-label">{{ article.read_string(show_inverse=True) }}</span></a>
                 </li>
                 <li>
                     <a href="#" data-toggle-bookmark="true" data-bookmark-url="/entry/bookmark/7595"
                         data-label-loading="Saving..." data-label-star="Star" data-label-unstar="Unstar"
-                        data-value="unstar"><svg class="icon" aria-hidden="true">
+                        data-value="unstar"><svg class="icon" aria-hidden="true`">
                             <use xlink:href="/static/icon/sprite.svg#icon-star" />
                         </svg><span class="icon-label">Star</span></a>
                 </li>

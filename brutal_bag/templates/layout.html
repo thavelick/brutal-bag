@@ -15,8 +15,9 @@
             <div class="logo">
                 <a href="/">Brutal<span>Bag</span></a>
             </div>
+            {% set active_page = request.path %}
             <ul>
-                <li>
+                <li class="{{ 'active' if active_page == '/' }}">
                     <a href="/">Unread
                         <span class="unread-counter-wrapper">
                             (<span class="unread-counter">{{ count_unread }}</span>)
@@ -25,18 +26,18 @@
                 </li>
                 <!-- <li>
                     <a href="/starred">Starred</a>
-                </li>
-                <li>
+                </li> -->
+                <li class="{{ 'active' if active_page == '/history' }}">
                     <a href="/history">History</a>
                 </li>
-                <li class="active">
+                <!-- <li class="active">
                     <a href="/feeds">Feeds
                     </a>
                     <a href="/subscribe">
                         (+)
                     </a>
                 </li> -->
-                <li>
+                <li class="{{ 'active' if active_page == '/tags' }}">
                     <a href="/tags">Tags</a>
                 </li>
             </ul>

@@ -26,6 +26,7 @@ class WallabagArticleFetcher:
 
         dest_dict["id"] = str(entry.get("id"))
         dest_dict["external_url"] = entry.get("url")
+        dest_dict["is_read"] = entry.get("is_archived", 0) == 1
 
         raw_tags = entry.get("tags", [])
 

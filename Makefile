@@ -19,8 +19,7 @@ test: # Run tests
 	(source venv/bin/activate && pytest -rP --cov=brutal_bag --cov-report=html)
 
 tcr: # test and commit or revert
-	source venv/bin/activate && pytest -rP --cov=brutal_bag --cov-report=html && git add . && git commit -m "wip" || git reset --hard
-
+	source venv/bin/activate && pytest -rP --cov=brutal_bag --cov-report=html && git add . && generate_commit_message.py | git commit -F - || echo "that didn't work"
 # -----------------------------------------------------------
 # CAUTION: If you have a file with the same name as make
 # command, you need to add it to .PHONY below, otherwise it

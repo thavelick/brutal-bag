@@ -11,6 +11,7 @@ class Article:
     "An article from a reader or bookmarking service like Wallabag"
     id: str
     content: str
+    is_read: bool
     title: str
 
     external_url: str = None
@@ -56,6 +57,12 @@ class Article:
             return self.external_url.split("/", 3)[2]
         except IndexError:
             return ""
+
+    def read_string(self, show_inverse=False):
+        "return a string of the read status"
+        if show_inverse ^ self.is_read:
+            return "Read"
+        return "Unread"
 
     def _now(self):
         "return the current date"

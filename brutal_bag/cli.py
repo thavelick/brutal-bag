@@ -9,6 +9,7 @@ from werkzeug.exceptions import NotFound
 from .models.favicon import get_favicon_url
 from .models.wallabag import Wallabag
 from .models.wallabag_article_fetcher import WallabagArticleFetcher
+from .models.wallabag_article_updater import WallabagArticleUpdater
 from .models.wallabag_tag_fetcher import WallabagTagFetcher
 
 
@@ -33,6 +34,18 @@ def create_app():
         return await render_template(
             "articles.html",
             articles=await WallabagArticleFetcher(wallabag).get_all(unread=True),
+        )
+
+    @app.route("/history")
+    async def history():
+        "History"
+        count_articles = await WallabagArticleFetcher(wallabag).get_count(unread=False)
+
+        return await render_template(
+            "articles.html",
+            articles=await WallabagArticleFetcher(wallabag).get_all(unread=False),
+            article_type="History",
+            count_articles=count_articles,
         )
 
     @app.route("/favicon/<domain>")
@@ -64,7 +77,7 @@ def create_app():
         return await render_template(
             "articles.html",
             articles=await WallabagArticleFetcher(wallabag).get_all(
-                unread=True, tag=tag_slug
+                unread=True, tag_name=tag_slug
             ),
             article_type=tag_slug,
             count_articles=count_articles,
@@ -74,10 +87,9 @@ def create_app():
     async def view_article(article_id):
         "View an article's content"
         article = await WallabagArticleFetcher(wallabag).get_by_id(article_id)
-
         if not article:
             raise NotFound
-
+        await WallabagArticleUpdater(wallabag).update_read_state(article_id, True)
         return await render_template("view.html", article=article)
 
     return app

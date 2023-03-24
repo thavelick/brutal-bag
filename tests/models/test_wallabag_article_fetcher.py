@@ -31,6 +31,7 @@ def elvis_entry_fixture():
         "published_at": "2019-11-13T13:51:47-0700",
         "reading_time": 3,
         "tags": [{"id": "1", "label": "Cave", "slug": "cave"}],
+        "is_archived": 1,
     }
 
 
@@ -42,6 +43,7 @@ def yeti_entry_fixture():
         "content": "He wore Dock Martins...",
         "url": "https://www.yetinews.com/2",
         "published_by": ["Questionable Geographic"],
+        "is_archived": 0,
     }
 
 
@@ -52,6 +54,7 @@ def test_wallabag_entry_to_article(elvis_entry):
     assert article.title == "Elvis Presley is alive and living in a cave"
     assert article.content == "A hobo wandering"
     assert article.external_url == "https://www.example.com/1"
+    assert article.is_read is True
     assert article.published_by == ["Hobo News"]
     assert article.date == datetime(2019, 11, 13, 20, 51, 47)
     assert article.reading_time == 3

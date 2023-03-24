@@ -91,3 +91,20 @@ class Wallabag:
         "get the number of articles in Wallabag for given parameters."
         result_list = await self.get_articles(unread=unread, tag=tag, per_page=1)
         return result_list.total
+
+    async def add_article(self, url):
+        "Add an article to Wallabag."
+        await self.connect()
+        return await self.wallabag_api.post_entries(url)
+
+    async def set_article_read(self, article_id, is_read):
+        "Set the read_state of an article."
+        await self.connect()
+        archive = 1 if is_read else 0
+        return await self.wallabag_api.patch_entries(article_id, archive=archive)
+
+    async def set_article_starred(self, article_id, is_starred):
+        "Set the starred state of an article."
+        await self.connect()
+        starred = 1 if is_starred else 0
+        return await self.wallabag_api.patch_entries(article_id, starred=starred)

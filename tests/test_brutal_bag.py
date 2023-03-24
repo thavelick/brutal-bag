@@ -9,6 +9,7 @@ from brutal_bag.cli import create_app
 from brutal_bag.models.article import Article
 from brutal_bag.models.tag import Tag
 from brutal_bag.models.wallabag_article_fetcher import WallabagArticleFetcher
+from brutal_bag.models.wallabag_article_updater import WallabagArticleUpdater
 from brutal_bag.models.wallabag_tag_fetcher import WallabagTagFetcher
 
 sample_articles = [
@@ -16,6 +17,7 @@ sample_articles = [
         title="Elvis Presley is alive and living in a cave",
         id="1",
         content="A hobo wandering in the Appalachian mountains...",
+        is_read=False,
         external_url="https://www.elvispresley.com/article/1",
         tags=[],
     ),
@@ -23,6 +25,7 @@ sample_articles = [
         title="A Yeti was seen on the New Jersey Turnpike",
         id="2",
         content="He wore Dock Martins... ",
+        is_read=False,
         published_by=["Questionable Geographic"],
         external_url="https://www.questionablegeographic.com/news/45687",
         tags=[],
@@ -75,6 +78,27 @@ async def test_homepage(mocker, client):
     assert "/view/2" in html
 
 
+async def test_history(mocker, client):
+    "test the history page"
+
+    mocker.patch.object(WallabagArticleFetcher, "get_all", return_value=sample_articles)
+    mocker.patch.object(
+        WallabagArticleFetcher, "get_count", return_value=len(sample_articles)
+    )
+    response = await client.get("/history")
+
+    assert response.status_code == 200
+    html = (await response.data).decode()
+    assert "Brutal<span>Bag</span>" in html
+
+    assert "Elvis Presley is alive and living in a cave" in html
+    assert "/view/1" in html
+
+    assert "A Yeti was seen on the New Jersey Turnpike" in html
+    assert "Questionable Geographic" in html
+    assert "/view/2" in html
+
+
 async def test_view_article(mocker, client):
     "test /view/<article_id>"
 
@@ -84,6 +108,7 @@ async def test_view_article(mocker, client):
     mocker.patch.object(
         WallabagArticleFetcher, "get_count", return_value=len(sample_articles)
     )
+    mocker.patch.object(WallabagArticleUpdater, "update_read_state")
 
     response = await client.get("/view/1")
     assert response.status_code == 200
