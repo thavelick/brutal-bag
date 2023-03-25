@@ -23,7 +23,7 @@ class Article:
     def published_by_str(self):
         "return a string of the publishers"
         if not self.published_by:
-            return ""
+            return self.external_domain()
 
         return ", ".join(self.published_by)
 

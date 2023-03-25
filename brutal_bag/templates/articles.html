@@ -82,9 +82,12 @@
                 <li>
                     <a href="#" title="Change entry status" data-toggle-status="true" data-label-loading="Saving..."
                         data-label-read="Read" data-label-unread="Unread"
-                        data-value="{{ article.read_string() | lower }}"><svg class="icon" aria-hidden="true">
-                            <use xlink:href="/static/icon/sprite.svg#icon-{{ article.read_string() | lower }}" />
-                        </svg><span class="icon-label">{{ article.read_string(show_inverse=True) }}</span></a>
+                        data-value="{{ article.read_string() | lower }}">
+                        <svg class="icon" aria-hidden="true">
+                            <use
+                                xlink:href="/static/icon/sprite.svg#icon-{{ article.read_string(show_inverse=True) | lower }}" />
+                        </svg>
+                        <span class="icon-label">{{ article.read_string(show_inverse=True) }}</span></a>
                 </li>
                 <li>
                     <a href="#" data-toggle-bookmark="true" data-bookmark-url="/entry/bookmark/7595"

@@ -38,8 +38,8 @@ def test_create(article):
     [
         (["Hobo News"], "Hobo News"),
         (["Hobo News", "Jack Black"], "Hobo News, Jack Black"),
-        ([], ""),
-        (None, ""),
+        ([], "www.example.com"),
+        (None, "www.example.com"),
     ],
 )
 def test_published_by_str(article, published_by, expected_str):

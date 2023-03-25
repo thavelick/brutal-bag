@@ -2,9 +2,67 @@
 {% extends "layout.html" %}
 {% block title %}{{ article.title }}{% endblock %}
 {% block content %}
+
+
 <section class="entry">
     <header class="entry-header">
-        <h1>{{ article.title }}</h1>
+        <h1>
+            <a href="{{ article.external_url }}" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">
+                {{ article.title }}
+            </a>
+        </h1>
+
+        <div class="entry-actions">
+            <ul>
+                <li>
+                    <a href="#" title="Change entry status">
+                        <svg class="icon" aria-hidden="true">
+                            <use
+                                xlink:href="/static/icon/sprite.svg#icon-{{ article.read_string(show_inverse=True) | lower }}" />
+                        </svg>
+                        <span class="icon-label">{{ article.read_string(show_inverse=True) }}</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ article.external_url }}" target="_blank" rel="noopener noreferrer"
+                        referrerpolicy="no-referrer" data-original-link="true">
+                        <svg class="icon" aria-hidden="true">
+                            <use xlink:href="/static/icon/sprite.svg#icon-external-link" />
+                        </svg>
+                        <span class="icon-label">External link</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="entry-meta" dir="auto">
+            {% if article.published_by_str() | length > 0 %}
+            <span class="entry-website">
+                <img src="/favicon/{{ article.external_domain() }}" width="16" height="16"
+                    alt="{{ article.published_by_str() }}">
+                {{ article.published_by_str() }}
+            </span>
+            {% endif %}
+
+            {% for tag in article.tags %}
+            <span class="category">
+                <a href="/tag/{{ tag.slug }}/entries">{{ tag.label }}</a>
+            </span>
+            {% endfor %}
+
+        </div>
+        <div class="entry-date">
+            <time datetime="{{ article.date }}" title="{{ article.date }}">
+                {{ article.relative_date() }}
+            </time>
+            {% if article.minutes_read() | length > 0 %}
+            &centerdot;
+            <span>
+                {{ article.minutes_read() }}
+            </span>
+            {% endif %}
+
+        </div>
     </header>
     <article role="article" class="entry-content">
         {{ article.content | safe }}
