@@ -48,7 +48,7 @@
 
                 <img src="/favicon/{{ article.external_domain() }}" width="16" height="16" loading="lazy">
 
-                <a href="/view/{{ article.id }}" title="{{ article.title }}">{{ article.title}}</a>
+                <a href="/view/{{ article.id }}" title="{{ article.title }}" rel="nofollow">{{ article.title}}</a>
             </span>
 
             {% for tag in article.tags %}
@@ -80,9 +80,7 @@
             </ul>
             <ul class="item-meta-icons">
                 <li>
-                    <a href="#" title="Change entry status" data-toggle-status="true" data-label-loading="Saving..."
-                        data-label-read="Read" data-label-unread="Unread"
-                        data-value="{{ article.read_string() | lower }}">
+                    <a href="{{ article.toggle_read_url() }}" title="Change entry status" rel="nofollow">
                         <svg class="icon" aria-hidden="true">
                             <use
                                 xlink:href="/static/icon/sprite.svg#icon-{{ article.read_string(show_inverse=True) | lower }}" />
@@ -96,15 +94,6 @@
                             <use xlink:href="/static/icon/sprite.svg#icon-star" />
                         </svg><span class="icon-label">Star</span></a>
                 </li>
-
-
-                <li>
-                    <a href="#" title="Save this article" data-save-entry="true" data-save-url="/entry/save/7595"
-                        data-label-loading="Saving..." data-label-done="Done!"><svg class="icon" aria-hidden="true">
-                            <use xlink:href="/static/icon/sprite.svg#icon-save" />
-                        </svg><span class="icon-label">Save</span></a>
-                </li>
-
                 <li>
                     <a href="{{ article.external_url }}" target="_blank" rel="noopener noreferrer"
                         referrerpolicy="no-referrer" data-original-link="true"><svg class="icon" aria-hidden="true">

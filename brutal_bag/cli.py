@@ -92,6 +92,20 @@ def create_app():
         await WallabagArticleUpdater(wallabag).update_read_state(article_id, True)
         return await render_template("view.html", article=article)
 
+    @app.route("/entry/<int:article_id>/set/<read_state>")
+    async def set_read(article_id, read_state):
+        "Set an article as read/unread"
+        if read_state == "read":
+            is_read = True
+        elif read_state == "unread":
+            is_read = False
+        else:
+            raise NotFound
+
+        await WallabagArticleUpdater(wallabag).update_read_state(article_id, is_read)
+
+        return redirect(quart.request.headers.get("Referer", "/"))
+
     return app
 
 

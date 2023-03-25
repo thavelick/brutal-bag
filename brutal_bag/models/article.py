@@ -64,6 +64,11 @@ class Article:
             return "Read"
         return "Unread"
 
+    def toggle_read_url(self):
+        "return the url to toggle the read status"
+        new_read_state = "unread" if self.is_read else "read"
+        return f"/entry/{self.id}/set/{new_read_state}"
+
     def _now(self):
         "return the current date"
         return datetime.utcnow()

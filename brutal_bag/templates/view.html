@@ -15,7 +15,7 @@
         <div class="entry-actions">
             <ul>
                 <li>
-                    <a href="#" title="Change entry status">
+                    <a href="{{ article.toggle_read_url() }}" title="Change entry status">
                         <svg class="icon" aria-hidden="true">
                             <use
                                 xlink:href="/static/icon/sprite.svg#icon-{{ article.read_string(show_inverse=True) | lower }}" />

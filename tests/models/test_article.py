@@ -104,3 +104,16 @@ def test_read_string_read_inverse(article):
 def test_read_string_unread_inverse(article):
     article.is_read = False
     assert article.read_string(show_inverse=True) == "Read"
+
+
+@pytest.mark.parametrize(
+    "is_read, expected_read_state",
+    [
+        (True, "unread"),
+        (False, "read"),
+    ],
+)
+def test_toggle_read_url(article, is_read, expected_read_state):
+    article.is_read = is_read
+
+    assert article.toggle_read_url() == f"/entry/1/set/{expected_read_state}"

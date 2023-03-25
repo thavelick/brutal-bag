@@ -186,3 +186,34 @@ async def test_favicon_async(client, mocker, favicon_url, expected_location):
     assert response.headers["Location"] == expected_location
     assert "Cache-Control" in response.headers
     assert response.headers["Cache-Control"] == "public, max-age=604800"
+
+
+@pytest.mark.parametrize(
+    "read_state, is_read, headers, expected_location",
+    [
+        ("read", True, {"Referer": "/view/1"}, "/view/1"),
+        ("unread", False, {"Referer": "/view/1"}, "/view/1"),
+        ("read", True, {}, "/"),
+    ],
+)
+async def test_set_entry_read_state(
+    read_state, is_read, headers, expected_location, mocker, client
+):
+    """Test /entry/<article_id>/set/read and /entry/<article_id>/set/unread"""
+
+    mocker.patch.object(WallabagArticleUpdater, "update_read_state")
+
+    response = await client.get(f"/entry/1/set/{read_state}", headers=headers)
+
+    assert response.status_code == 302
+    assert response.headers["Location"] == expected_location
+
+    # pylint: disable=E1101
+    WallabagArticleUpdater.update_read_state.assert_called_once_with(1, is_read)
+
+
+async def test_set_entry_read_state_invalid(client):
+    """Test /entry/<article_id>/set/read and /entry/<article_id>/set/unread"""
+    response = await client.get("/entry/1/set/invalid")
+
+    assert response.status_code == 404
