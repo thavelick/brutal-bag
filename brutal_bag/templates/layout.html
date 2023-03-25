@@ -15,31 +15,11 @@
             <div class="logo">
                 <a href="/">Brutal<span>Bag</span></a>
             </div>
-            {% set active_page = request.path %}
+            {% from '_menu_item.html' import menu_item %}
             <ul>
-                <li class="{{ 'active' if active_page == '/' }}">
-                    <a href="/">Unread
-                        <span class="unread-counter-wrapper">
-                            (<span class="unread-counter">{{ count_unread }}</span>)
-                        </span>
-                    </a>
-                </li>
-                <!-- <li>
-                    <a href="/starred">Starred</a>
-                </li> -->
-                <li class="{{ 'active' if active_page == '/history' }}">
-                    <a href="/history">History</a>
-                </li>
-                <!-- <li class="active">
-                    <a href="/feeds">Feeds
-                    </a>
-                    <a href="/subscribe">
-                        (+)
-                    </a>
-                </li> -->
-                <li class="{{ 'active' if active_page == '/tags' }}">
-                    <a href="/tags">Tags</a>
-                </li>
+                {{ menu_item('/', 'Unread', count_unread) }}
+                {{ menu_item('/history', 'History') }}
+                {{ menu_item('/tags', 'Tags') }}
             </ul>
             <div class="search">
                 <div class="search-toggle-switch ">

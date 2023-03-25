@@ -1,0 +1,12 @@
+{% macro menu_item(path, name, unread_counter=None) %}
+    <li class="{{ 'active' if request.path == path }}">
+        <a href="{{ path }}">{{ name }}
+            {% if unread_counter %}
+                <span class="unread-counter-wrapper">
+                    (<span class="unread-counter">{{ unread_counter }}</span>)
+                </span>
+            {% endif %}
+        </a>
+    </li>
+{% endmacro %}
+
